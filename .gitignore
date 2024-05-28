@@ -1,0 +1,7 @@
+.idea
+.aws-sam
+**/*.zip
+
+# Dependencies
+requirements.txt
+packages/
