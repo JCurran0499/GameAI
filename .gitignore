@@ -3,6 +3,5 @@
 **/*.zip
 
 # Dependencies
-Pipfile.lock
 requirements.txt
 packages/
