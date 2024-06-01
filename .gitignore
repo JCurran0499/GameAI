@@ -5,3 +5,6 @@
 # Dependencies
 requirements.txt
 packages/
+
+# Misc
+s3_bucket.txt

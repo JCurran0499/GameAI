@@ -1,7 +1,36 @@
 Transform: AWS::Serverless-2016-10-31
 Description: AWS Resources for the GameAI backend
 
+Parameters:
+  Owner:
+    Type: String
+    Default: jack
+
+  Project:
+    Type: String
+    Default: GameAI
+
 Resources:
+  # IAM
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+      Description: IAM Role allowing GameAI access to DynamoDB
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      RoleName: Lambda-game-ai
+      Tags:
+        Owner: !Ref Owner
+        Project: !Ref Project
+
+  # Lambda
   DependencyLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -10,5 +39,28 @@ Resources:
         - x86_64
       CompatibleRuntimes:
         - python3.9
-      ContentUri: packages
+      ContentUri: ./packages
       LayerName: gameai_dependencies
+
+  GameAI:
+    Type: AWS::Serverless:Function
+    Properties:
+      Architectures:
+        - arm64
+      CodeUri: ./main
+      Description: The GameAI backend
+      Environment:
+        Variables:
+          POWERTOOLS_SERVICE_NAME: game-ai
+          POWERTOOLS_LOG_LEVEL: INFO
+      FunctionName: game-ai
+      Handler: main.app.handler
+      Layers:
+        - !Ref DependencyLayer
+      MemorySize: 512
+      Runtime: python3.9
+      Role: !GetAtt LambdaRole.Arn
+      Timeout: 900
+      Tags:
+        Owner: !Ref Owner
+        Project: !Ref Project
