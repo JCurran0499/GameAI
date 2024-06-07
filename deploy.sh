@@ -11,4 +11,7 @@ fi
 read -r S3_BUCKET < s3_bucket.txt
 
 sam build -t cloudformation.yaml
-sam deploy -t cloudformation.yaml --stack-name GameAI --s3-bucket $S3_BUCKET
+sam deploy -t cloudformation.yaml \
+    --stack-name GameAI \
+    --capabilities CAPABILITY_NAMED_IAM \
+    --s3-bucket $S3_BUCKET

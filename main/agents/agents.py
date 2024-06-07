@@ -1,6 +1,6 @@
 import random
-from main.agents.monte_carlo_tree import MonteCarloTree
-from main.games.templates.game_2d import Move
+from agents.monte_carlo_tree import MonteCarloTree
+from games.templates.game_2d import Move
 
 class Agent:
     def __init__(self, id: int, tree: MonteCarloTree):

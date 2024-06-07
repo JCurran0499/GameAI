@@ -1,4 +1,4 @@
-from main.games.templates.game_2d import Game2D, Move, Square
+from games.templates.game_2d import Game2D, Move, Square
 from typing import List
 
 class TTTMove(Move):

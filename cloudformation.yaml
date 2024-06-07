@@ -10,6 +10,10 @@ Parameters:
     Type: String
     Default: GameAI
 
+  AppName:
+    Type: String
+    Default: Game-AI
+
 Resources:
   # IAM
   LambdaRole:
@@ -25,10 +29,13 @@ Resources:
       Description: IAM Role allowing GameAI access to DynamoDB
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
-      RoleName: Lambda-game-ai
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      RoleName: !Sub Lambda-${AppName}
       Tags:
-        Owner: !Ref Owner
-        Project: !Ref Project
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Project
+          Value: !Ref Project
 
   # Lambda
   DependencyLayer:
@@ -43,7 +50,7 @@ Resources:
       LayerName: gameai_dependencies
 
   GameAI:
-    Type: AWS::Serverless:Function
+    Type: AWS::Serverless::Function
     Properties:
       Architectures:
         - arm64
@@ -51,10 +58,18 @@ Resources:
       Description: The GameAI backend
       Environment:
         Variables:
-          POWERTOOLS_SERVICE_NAME: game-ai
+          POWERTOOLS_SERVICE_NAME: !Ref AppName
           POWERTOOLS_LOG_LEVEL: INFO
-      FunctionName: game-ai
-      Handler: main.app.handler
+      FunctionName: !Ref AppName
+      Handler: app.handler
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref GameAIHttpApi
+            Method: GET
+            Path: /health
+            PayloadFormatVersion: "2.0"
       Layers:
         - !Ref DependencyLayer
       MemorySize: 512
@@ -64,3 +79,53 @@ Resources:
       Tags:
         Owner: !Ref Owner
         Project: !Ref Project
+
+  # API Gateway
+  GameAIHttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Description: API frontend for the GameAI
+      Name: !Sub ${AppName}
+      ProtocolType: HTTP
+      Tags:
+        Owner: !Ref Owner
+        Project: !Ref Project
+
+  GameAIHttpApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref GameAIHttpApi
+      AutoDeploy: true
+      StageName: $default
+      Tags:
+        Owner: !Ref Owner
+        Project: !Ref Project
+
+  APIGameAILambdaIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref GameAIHttpApi
+      Description: Integration the frontend API with the GameAI lambda
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Join
+        - ""
+        - - "arn:"
+          - !Ref "AWS::Partition"
+          - ":apigateway:"
+          - !Ref "AWS::Region"
+          - ":lambda:path/2015-03-31/functions/"
+          - !GetAtt GameAI.Arn
+          - /invocations
+      PayloadFormatVersion: "2.0"
+
+  APIHealthRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref GameAIHttpApi
+      AuthorizationType: NONE
+      RouteKey: GET /health
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref APIGameAILambdaIntegration
+  
