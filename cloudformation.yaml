@@ -46,29 +46,30 @@ Resources:
         - x86_64
       CompatibleRuntimes:
         - python3.12
-      ContentUri: ./packages
+      ContentUri: ./layer
       LayerName: !Sub ${AppName}-dependencies
+      RetentionPolicy: Delete
 
   GameAI:
     Type: AWS::Serverless::Function
     Properties:
       Architectures:
         - arm64
-      CodeUri: ./main
+      CodeUri: ./src
       Description: The GameAI backend
       Environment:
         Variables:
           POWERTOOLS_SERVICE_NAME: !Ref AppName
           POWERTOOLS_LOG_LEVEL: INFO
       FunctionName: !Ref AppName
-      Handler: app.handler
+      Handler: main.app.handler
       Events:
         ApiEvent:
           Type: HttpApi
           Properties:
             ApiId: !Ref GameAIHttpApi
-            Method: GET
-            Path: /health
+            Method: ANY
+            Path: /{path+}
             PayloadFormatVersion: "2.0"
       Layers:
         - !Ref DependencyLayer
@@ -101,7 +102,7 @@ Resources:
         Owner: !Ref Owner
         Project: !Ref Project
 
-  APIGameAILambdaIntegration:
+  GameAIHttpApiIntegration:
     Type: AWS::ApiGatewayV2::Integration
     Properties:
       ApiId: !Ref GameAIHttpApi
@@ -118,14 +119,14 @@ Resources:
           - /invocations
       PayloadFormatVersion: "2.0"
 
-  APIHealthRoute:
+  GameAIHttpApiRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref GameAIHttpApi
       AuthorizationType: NONE
-      RouteKey: GET /health
+      RouteKey: ANY /{path+}
       Target: !Join
         - "/"
         - - "integrations"
-          - !Ref APIGameAILambdaIntegration
+          - !Ref GameAIHttpApiIntegration
   

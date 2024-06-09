@@ -1,10 +1,9 @@
-from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
-
 from aws_lambda_powertools.event_handler import APIGatewayHttpResolver
 from aws_lambda_powertools.logging.correlation_paths import API_GATEWAY_HTTP
 
-logger = Logger()
+from main.domain.constants import logger
+
 api = APIGatewayHttpResolver()
 
 @api.get("/health")

@@ -1,14 +1,17 @@
 import numpy as np
+from typing import Any
 from copy import deepcopy
+from abc import ABC, abstractmethod
 
-class Move:
+class Move(ABC):
     pass
 
-class Square:
+class Square(ABC):
     def __init__(self, row: int, col: int):
         self.r = row
         self.c = col
 
+    @abstractmethod
     def free(self) -> bool:
         raise NotImplementedError
     
@@ -19,13 +22,14 @@ class Square:
         return isinstance(value, Square) and self.r == value.r and self.c == value.c
 
 
-class Game2D:
-    def __init__(self, rows: int, cols: int, SquareClass):
+class Game2D(ABC):
+    def __init__(self, rows: int, cols: int, first_turn_agent, SquareClass):
         self.board = [
             [SquareClass(r, c) for c in range(cols)] for r in range(rows)
         ]
         self.rows = rows
         self.cols = cols
+        self.first_turn_agent = first_turn_agent
 
     def copy(self, **kwargs):
         new_board = deepcopy(self.board)
@@ -41,27 +45,27 @@ class Game2D:
         return (r < 0 or r >= self.rows) or (c < 0 or c >= self.cols)
 
     # -- Abstract Methods -- #
-    def game_over(self) -> bool:
+    @abstractmethod
+    def game_over(self) -> tuple[bool, Any]: # must return game over status and winner
         raise NotImplementedError
     
-    def winner(self): # can assume is called after game_over()
-        raise NotImplementedError
-    
-    def draw(self) -> bool: # can assume is called after game_over()
-        raise NotImplementedError
-    
+    @abstractmethod
     def active_agent(self):
         raise NotImplementedError
     
+    @abstractmethod
     def next_agent(self):
         raise NotImplementedError
     
+    @abstractmethod
     def move(self, agent, move):
         raise NotImplementedError
     
+    @abstractmethod
     def move_allowed(self, agent, move) -> bool:
         raise NotImplementedError
     
+    @abstractmethod
     def all_moves(self) -> list[Move]:
         raise NotImplementedError
     

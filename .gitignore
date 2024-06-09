@@ -1,10 +1,13 @@
 .idea
 .aws-sam
+.pytest_cache
+.vscode
 **/*.zip
 
 # Dependencies
 requirements.txt
-packages/
+layer/
 
 # Misc
 s3_bucket.txt
+**/__pycache__

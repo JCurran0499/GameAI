@@ -1,4 +1,4 @@
-from games.templates.game_2d import Game2D, Move
+from main.games.templates.game_2d import Game2D, Move
 
 class MonteCarloTree:
     class Node:

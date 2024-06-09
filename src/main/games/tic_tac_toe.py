@@ -1,5 +1,7 @@
-from games.templates.game_2d import Game2D, Move, Square
-from typing import List
+from typing import List, Any
+
+from main.games.templates.game_2d import Game2D, Move, Square
+from main.domain.exceptions import InvalidBoardConfigurationException
 
 class TTTMove(Move):
     def __init__(self, row: int, col: int):
@@ -17,17 +19,25 @@ class TTTSquare(Square):
 
 
 class TicTacToe(Game2D):
-    def __init__(self):
-        super().__init__(3, 3, SquareClass=TTTSquare)
+    players = ["X", "O"]
+
+    def __init__(self, first_turn_agent):
+        super().__init__(3, 3, first_turn_agent, SquareClass=TTTSquare)
         self.last_placed: TTTSquare = None
-        self.players = ["X", "O"]
-        self.winning_player = None
+
+        if self.first_turn_agent not in self.players:
+            raise InvalidBoardConfigurationException("invalid starting player")
+
+        self.player_map = {
+            self.players[0]: self.players[1],
+            self.players[1]: self.players[0]
+        }
 
         self.board: List[List[TTTSquare]]
 
-    def game_over(self) -> bool:
+    def game_over(self) -> tuple[bool, Any]:
         if self.last_placed is None:
-            return False
+            return (False, None)
         
         for line in [
             [(-2, -2), (-1, -1), (1, 1), (2, 2)],
@@ -42,26 +52,18 @@ class TicTacToe(Game2D):
                     count += 1
 
                 if count >= 2:
-                    self.winning_player = self.last_placed.agent
-                    return True
+                    return (True, self.last_placed.agent)
                     
-        return len(self.all_moves()) == 0
-
-    def winner(self):
-        return self.winning_player
-        
-    def draw(self) -> bool:
-        return (self.winning_player is None) and (len(self.all_moves()) == 0)
+        return (len(self.all_moves()) == 0, None)
     
     def active_agent(self):
-        opponent_map = {
-            self.players[0]: self.players[1],
-            self.players[1]: self.players[0]
-        }
-        return opponent_map[self.last_placed.agent]
+        if self.last_placed is None:
+            return self.first_turn_agent
+        else:
+            return self.player_map[self.last_placed.agent]
     
     def next_agent(self):
-        return self.last_placed.agent
+        return self.player_map[self.active_agent()]
 
     def move(self, agent, move: TTTMove):
         if self.move_allowed(agent, move):
