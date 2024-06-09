@@ -1,6 +1,6 @@
 if ! [ -d packages ]; then
     pipenv run pip freeze > requirements.txt
-    pip3 install -r requirements.txt -t packages/python/lib/python3.9/site-packages
+    pip3 install -r requirements.txt -t packages/python/lib/python3.12/site-packages
 fi
 
 if ! [ -f s3_bucket.txt ]; then

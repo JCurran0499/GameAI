@@ -45,9 +45,9 @@ Resources:
         - arm64
         - x86_64
       CompatibleRuntimes:
-        - python3.9
+        - python3.12
       ContentUri: ./packages
-      LayerName: gameai_dependencies
+      LayerName: !Sub ${AppName}-dependencies
 
   GameAI:
     Type: AWS::Serverless::Function
@@ -73,7 +73,7 @@ Resources:
       Layers:
         - !Ref DependencyLayer
       MemorySize: 512
-      Runtime: python3.9
+      Runtime: python3.12
       Role: !GetAtt LambdaRole.Arn
       Timeout: 900
       Tags:
