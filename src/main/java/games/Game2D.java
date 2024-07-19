@@ -7,6 +7,7 @@ public abstract class Game2D<S, M> implements Game<M> {
     protected String playerAgent = null;
 
     protected void setBoard(int rows, int cols) {
+        board = new ArrayList<>();
         for (int r = 0; r < rows; r++) {
             board.add(new ArrayList<>());
 
@@ -16,7 +17,7 @@ public abstract class Game2D<S, M> implements Game<M> {
     }
 
     protected abstract S newSpace(int r, int c);
-    protected abstract Game2D<S, M> copy();
+    public abstract Game2D<S, M> copy();
 
     /*
      * Optional override
@@ -30,5 +31,9 @@ public abstract class Game2D<S, M> implements Game<M> {
         }
 
         return 0;
+    }
+
+    public S get(int r, int c) {
+        return this.board.get(r).get(c);
     }
 }

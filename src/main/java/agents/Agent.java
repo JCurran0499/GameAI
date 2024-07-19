@@ -1,5 +1,5 @@
 package agents;
 
-public interface Agent {
-    Object takeTurn();
+public interface Agent<M> {
+    M takeTurn();
 }

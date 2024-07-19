@@ -1,16 +1,18 @@
 package resources;
 
 import games.Game;
-
+import lombok.Getter;
 import java.util.*;
 import java.lang.Math;
 
+@Getter
 public class MonteCarloTree<M> {
+    @Getter
     public class Node  {
-        private String agent;
-        private M lastMove;
-        private Game<M> state;
-        private List<Node> branches;
+        private final String agent;
+        private final M lastMove;
+        private final Game<M> state;
+        private final List<Node> branches;
 
         private double heuristic;
 
@@ -24,7 +26,7 @@ public class MonteCarloTree<M> {
         }
 
         public void instantiate(int depth) {
-            if (this.branches.isEmpty() && !this.state.gameOver() && depth > 0) {
+            if (isLeaf() && !this.state.gameOver() && depth > 0) {
                 List<M> allMoves = this.state.allMoves();
                 for (M move : allMoves) {
                     Game<M> nextState = this.state.move(this.agent, move);
@@ -40,7 +42,7 @@ public class MonteCarloTree<M> {
             for (Node branch : this.branches)
                 branch.propagateMinMax();
 
-            if (!this.branches.isEmpty()) {
+            if (!isLeaf()) {
                 double[] options = this.branches.stream().mapToDouble(node -> node.heuristic).toArray();
                 if (this.agent.equals(botAgent))
                     this.heuristic = maxHeuristic(options);
@@ -50,6 +52,10 @@ public class MonteCarloTree<M> {
             else {
                 this.heuristic = this.state.heuristic();
             }
+        }
+
+        public boolean isLeaf() {
+            return this.branches.isEmpty();
         }
 
         private double minHeuristic(double[] options) {
@@ -70,5 +76,29 @@ public class MonteCarloTree<M> {
     }
 
     private Node head;
-    private String botAgent;
+    private final String botAgent;
+    private final int depth;
+
+    public MonteCarloTree(Game<M> initialState, String botAgent, int depth) {
+        this.head = new Node(initialState, null);
+        this.botAgent = botAgent;
+        this.depth = depth;
+
+        this.head.instantiate(depth);
+        this.head.propagateMinMax();
+    }
+
+    public void move(Node node) {
+        this.head = node;
+        this.head.instantiate(this.depth);
+        this.head.propagateMinMax();
+    }
+
+    public String winner() {
+        return this.head.state.winner();
+    }
+
+    public boolean isDraw() {
+        return (winner() == null) && (this.head.isLeaf());
+    }
 }

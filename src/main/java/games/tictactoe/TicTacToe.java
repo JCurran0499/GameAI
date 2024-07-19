@@ -6,28 +6,32 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
     private static final int ROWS = 3;
     private static final int COLS = 3;
 
-    private String firstTurnAgent;
+    private final boolean playerGoesFirst;
     private String winner = null;
     private Square lastPlaced = null;
 
-    public TicTacToe(String playerAgent, String firstTurnAgent) {
+    public TicTacToe(String playerAgent, boolean playerGoesFirst) {
         setBoard(ROWS, COLS);
         this.playerAgent = playerAgent;
-        this.firstTurnAgent = firstTurnAgent;
+        this.playerGoesFirst = playerGoesFirst;
     }
 
     protected Square newSpace(int r, int c) {
         return new Square(r, c);
     }
 
-    protected TicTacToe copy() {
-        TicTacToe newGame = new TicTacToe(this.firstTurnAgent, this.winner, this.lastPlaced.copy());
+    public TicTacToe copy() {
+        TicTacToe newGame = new TicTacToe(
+            this.playerGoesFirst, this.winner,
+            (lastPlaced == null) ? null : lastPlaced.copy()
+        );
 
         ArrayList<ArrayList<Square>> newBoard = new ArrayList<>(this.board.stream().map(
             row -> new ArrayList<>(row.stream().map(Square::copy).toList())
@@ -55,7 +59,7 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
         for (Move[] line : lines) {
             count = 0;
             for (Move xy : line) {
-                Square newPosition = this.lastPlaced.shift(xy.x, xy.y);
+                Square newPosition = get(this.lastPlaced.getRow() + xy.x, this.lastPlaced.getCol()+ xy.y);
                 if (newPosition != null && newPosition.getAgent().equals(this.lastPlaced.getAgent()))
                     count += 1;
 
@@ -77,13 +81,10 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
     @Override
     public String activeAgent() {
         if (this.lastPlaced == null)
-            return this.firstTurnAgent;
+            return this.playerGoesFirst ? this.playerAgent : oppositeAgent(this.playerAgent);
 
         else {
-            if (this.lastPlaced.getAgent().equals("X"))
-                return "O";
-            else
-                return "X";
+            return oppositeAgent(this.lastPlaced.getAgent());
         }
     }
 
@@ -94,8 +95,8 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
 
         TicTacToe newGame = this.copy();
 
-        newGame.board.get(move.x).get(move.y).setAgent(agent);
-        newGame.lastPlaced = newGame.board.get(move.x).get(move.y);
+        newGame.get(move.x, move.y).setAgent(agent);
+        newGame.lastPlaced = newGame.get(move.x, move.y);
         return newGame;
     }
 
@@ -104,7 +105,7 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
         return (
             (agent.equals("X") || agent.equals("O")) &&
             !(move.x < 0 || move.x >= 3) || (move.y < 0 || move.y >= 3) &&
-            (this.board.get(move.x).get(move.y).free())
+            (this.get(move.x, move.y).free())
         );
     }
 
@@ -130,10 +131,17 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
         return visualization.toString();
     }
 
+    public static String oppositeAgent(String agent) {
+        if (agent.equals("X"))
+            return "O";
+        else
+            return "X";
+    }
+
     @Getter
     @Setter
-    @Builder(toBuilder = true)
-    public class Square {
+    @AllArgsConstructor
+    public static class Square {
         private final int row;
         private final int col;
         private String agent;
@@ -148,23 +156,13 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
             return this.agent == null;
         }
 
-        public Square shift(int r, int c) {
-            if (Square.outOfBounds(r, c))
-                return null;
-
-            return board.get(this.row + r).get(this.col + c);
-        }
-
         public String toString() {
-            return Objects.requireNonNullElse(this.agent, " ");
-        }
-
-        public static boolean outOfBounds(int row, int col) {
-            return (row < 0 || row >= 3) || (col < 0 || col >= 3);
+            int squareIndex = (this.getRow() * 3) + this.getCol();
+            return Objects.requireNonNullElse(this.agent, String.valueOf(squareIndex));
         }
 
         public Square copy() {
-            return this.toBuilder().build();
+            return new Square(this.row, this.col, this.agent);
         }
     }
 
