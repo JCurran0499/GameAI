@@ -19,12 +19,12 @@ public class Walker<M> implements Agent<M> {
     }
 
     public M takeTurn() {
-        List<MonteCarloTree<M>.Node> branches = this.tree.getHead().getBranches();
-        MonteCarloTree<M>.Node choice = branches.get(
-            random.nextInt(branches.size())
+        List<M> moves = this.tree.getHead().getBranches().keySet().stream().toList();
+        M choice = moves.get(
+            random.nextInt(moves.size())
         );
 
         this.tree.move(choice);
-        return choice.getLastMove();
+        return choice;
     }
 }

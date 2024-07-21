@@ -2,7 +2,9 @@ package resources;
 
 import games.Game;
 import lombok.Getter;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import java.lang.Math;
 
 @Getter
@@ -10,17 +12,15 @@ public class MonteCarloTree<M> {
     @Getter
     public class Node  {
         private final String agent;
-        private final M lastMove;
         private final Game<M> state;
-        private final List<Node> branches;
+        private final Map<M, Node> branches;
 
         private double heuristic;
 
-        public Node(Game<M> initialState, M lastMove) {
-            this.agent = initialState.activeAgent();
-            this.lastMove = lastMove;
-            this.state = initialState;
-            this.branches = new ArrayList<>();
+        public Node(Game<M> state) {
+            this.agent = state.activeAgent();
+            this.state = state;
+            this.branches = new LinkedHashMap<>();
 
             this.heuristic = 0;
         }
@@ -29,21 +29,21 @@ public class MonteCarloTree<M> {
             if (isLeaf() && !this.state.gameOver() && depth > 0) {
                 List<M> allMoves = this.state.allMoves();
                 for (M move : allMoves) {
-                    Game<M> nextState = this.state.move(this.agent, move);
-                    this.branches.add(new Node(nextState, move));
+                    Game<M> nextState = this.state.move(move);
+                    this.branches.put(move, new Node(nextState));
                 }
 
-                for (Node branch : this.branches)
+                for (Node branch : this.branches.values())
                     branch.instantiate(depth - 1);
             }
         }
 
         public void propagateMinMax() {
-            for (Node branch : this.branches)
+            for (Node branch : this.branches.values())
                 branch.propagateMinMax();
 
             if (!isLeaf()) {
-                double[] options = this.branches.stream().mapToDouble(node -> node.heuristic).toArray();
+                double[] options = this.branches.values().stream().mapToDouble(node -> node.heuristic).toArray();
                 if (this.agent.equals(botAgent))
                     this.heuristic = maxHeuristic(options);
                 else
@@ -79,26 +79,18 @@ public class MonteCarloTree<M> {
     private final String botAgent;
     private final int depth;
 
-    public MonteCarloTree(Game<M> initialState, String botAgent, int depth) {
-        this.head = new Node(initialState, null);
-        this.botAgent = botAgent;
+    public MonteCarloTree(Game<M> initialState, int depth) {
+        this.head = new Node(initialState);
+        this.botAgent = initialState.getBotAgent();
         this.depth = depth;
 
         this.head.instantiate(depth);
         this.head.propagateMinMax();
     }
 
-    public void move(Node node) {
-        this.head = node;
+    public void move(M move) {
+        this.head = this.head.branches.get(move);
         this.head.instantiate(this.depth);
         this.head.propagateMinMax();
-    }
-
-    public String winner() {
-        return this.head.state.winner();
-    }
-
-    public boolean isDraw() {
-        return (winner() == null) && (this.head.isLeaf());
     }
 }

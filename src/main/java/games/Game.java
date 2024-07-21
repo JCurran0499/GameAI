@@ -3,6 +3,8 @@ package games;
 import java.util.List;
 
 public interface Game<M> {
+    String getBotAgent();
+
     boolean gameOver();
 
     // can assume that gameOver() will always be called before winner()
@@ -10,11 +12,13 @@ public interface Game<M> {
 
     String activeAgent();
 
-    Game<M> move(String agent, M move);
+    Game<M> move(M move);
 
-    boolean moveLegal(String agent, M move);
+    boolean moveLegal(M move);
 
     List<M> allMoves();
 
     double heuristic();
+
+    String visualize();
 }
