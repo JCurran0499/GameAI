@@ -1,5 +1,7 @@
 package agents;
 
-public interface Agent<M> {
-    M takeTurn();
+import resources.MonteCarloTree;
+
+public interface Agent {
+    <M> M takeTurn(MonteCarloTree<M> tree);
 }

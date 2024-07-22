@@ -32,10 +32,10 @@ public abstract class Game2D<S, M> implements Game<M> {
      */
     public double heuristic() {
         if (gameOver() && (winner() != null)) {
-            if (winner().equals(this.playerAgent))
+            if (winner().equals(this.botAgent))
                 return Double.MAX_VALUE;
             else
-                return Double.MIN_VALUE;
+                return Double.MAX_VALUE * -1;
         }
 
         return 0;

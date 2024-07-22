@@ -13,10 +13,11 @@ public abstract class CommandLineApp<M> {
     protected boolean playerGoesFirst;
     protected Game<M> game;
     protected MonteCarloTree<M> monteCarloTree;
-    protected Agent<M> botAgent;
+    protected Agent botAgent;
 
-    // must implement the instantiation for "game" and "monteCarloTree", and "botAgent";
-    public CommandLineApp() {
+    // must implement the instantiation for "game" and "monteCarloTree"
+    public CommandLineApp(Agent botAgent) {
+        this.botAgent = botAgent;
         this.playerAgent = playerAgentChoice();
         System.out.println("You chose " + playerAgent + "!");
 
@@ -38,16 +39,16 @@ public abstract class CommandLineApp<M> {
             }
 
             else {
-                M move = this.botAgent.takeTurn();
+                M move = this.botAgent.takeTurn(this.monteCarloTree);
                 this.game = this.game.move(move);
             }
         }
 
         System.out.println("\r" + game.visualize());
-        if (game.winner().equals(this.playerAgent))
-            System.out.println("Congratulations! You won!");
-        else if (game.winner() == null)
+        if (game.winner() == null)
             System.out.println("The game was a draw!");
+        else if (game.winner().equals(this.playerAgent))
+            System.out.println("Congratulations! You won!");
         else
             System.out.println("Sorry! You lost :(");
     }

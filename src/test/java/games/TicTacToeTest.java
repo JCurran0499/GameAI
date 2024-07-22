@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import games.tictactoe.TicTacToe;
 
 public class TicTacToeTest {
-    private TicTacToe game;
+    private static TicTacToe game;
 
     @Test
     public void squareCopy() {

@@ -1,15 +1,15 @@
 package cli;
 
+import agents.Agent;
 import agents.Walker;
 import games.tictactoe.TicTacToe;
 import resources.MonteCarloTree;
 
 public class TicTacToeCLI extends CommandLineApp<TicTacToe.Move> {
-    public TicTacToeCLI() {
-        super();
+    public TicTacToeCLI(Agent botAgent) {
+        super(botAgent);
         this.game = new TicTacToe(this.playerAgent, this.playerGoesFirst);
         this.monteCarloTree = new MonteCarloTree<>(game, 5);
-        this.botAgent = new Walker<>(this.monteCarloTree);
     }
 
     protected TicTacToe.Move playerMoveChoice() {

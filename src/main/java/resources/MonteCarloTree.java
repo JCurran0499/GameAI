@@ -89,6 +89,9 @@ public class MonteCarloTree<M> {
     }
 
     public void move(M move) {
+        if (move == null)
+            throw new RuntimeException("invalid move");
+
         this.head = this.head.branches.get(move);
         this.head.instantiate(this.depth);
         this.head.propagateMinMax();

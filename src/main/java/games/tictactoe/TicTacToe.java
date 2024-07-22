@@ -2,6 +2,7 @@ package games.tictactoe;
 
 import games.Game2D;
 import lombok.*;
+import resources.ConsoleColors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,9 +117,10 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
     public String visualize() {
         StringBuilder visualization = new StringBuilder();
         for (ArrayList<Square> row : this.board) {
-            visualization.append("\n");
+        visualization.append("\n" + ConsoleColors.WHITE_BACKGROUND + ConsoleColors.BLACK);
             for (Square square : row)
                 visualization.append("[").append(square.toString()).append("]");
+            visualization.append(ConsoleColors.RESET);
         }
 
         return visualization.toString();
@@ -151,11 +153,21 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
 
         public String toString() {
             int squareIndex = (this.getRow() * 3) + this.getCol() + 1;
-            return Objects.requireNonNullElse(this.agent, String.valueOf(squareIndex));
+            return agentToString(this.agent, squareIndex);
         }
 
         public Square copy() {
             return new Square(this.row, this.col, this.agent);
+        }
+
+        private String agentToString(String agent, int index) {
+            if (agent == null)
+                return String.valueOf(index);
+
+            if (agent.equals("X"))
+                return ConsoleColors.BLUE + agent + ConsoleColors.RESET + ConsoleColors.WHITE_BACKGROUND + ConsoleColors.BLACK;
+            else
+                return ConsoleColors.RED + agent + ConsoleColors.RESET + ConsoleColors.WHITE_BACKGROUND + ConsoleColors.BLACK;
         }
     }
 
