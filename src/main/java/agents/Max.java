@@ -11,13 +11,10 @@ import java.util.Map;
 public class Max implements Agent {
     public <M> M takeTurn(MonteCarloTree<M> tree) {
         M choice = null;
-        double heuristic = Double.MAX_VALUE * -1;
         Map<M, MonteCarloTree<M>.Node> branches = tree.getHead().getBranches();
         for (M move : branches.keySet()) {
-            if (branches.get(move).getHeuristic() > heuristic) {
+            if (branches.get(move).compareTo(branches.get(choice)) > 0)
                 choice = move;
-                heuristic = branches.get(move).getHeuristic();
-            }
         }
 
         tree.move(choice);

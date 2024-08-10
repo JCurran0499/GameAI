@@ -2,6 +2,8 @@ package resources;
 
 import games.Game;
 import lombok.Getter;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -16,21 +18,27 @@ public class MonteCarloTree<M> {
         private final Map<M, Node> branches;
 
         private double heuristic;
+        private int gameTime;
 
-        public Node(Game<M> state) {
+        private Node(Game<M> state) {
             this.agent = state.activeAgent();
             this.state = state;
             this.branches = new LinkedHashMap<>();
 
             this.heuristic = 0;
+            this.gameTime = 0;
         }
 
         public void instantiate(int depth) {
-            if (isLeaf() && !this.state.gameOver() && depth > 0) {
-                List<M> allMoves = this.state.allMoves();
-                for (M move : allMoves) {
-                    Game<M> nextState = this.state.move(move);
-                    this.branches.put(move, new Node(nextState));
+            if (depth > 0) {
+                if (isLeaf() && !this.state.gameOver()) {
+                    List<M> allMoves = this.state.allMoves();
+                    for (M move : allMoves) {
+                        Game<M> nextState = this.state.move(move);
+                        Node child = new Node(nextState);
+                        child.gameTime = this.gameTime + 1;
+                        this.branches.put(move, child);
+                    }
                 }
 
                 for (Node branch : this.branches.values())
@@ -43,11 +51,15 @@ public class MonteCarloTree<M> {
                 branch.propagateMinMax();
 
             if (!isLeaf()) {
-                double[] options = this.branches.values().stream().mapToDouble(node -> node.heuristic).toArray();
+                List<Node> options = this.branches.values().stream().toList();
+                double[] strategyInfo;
                 if (this.agent.equals(botAgent))
-                    this.heuristic = maxHeuristic(options);
+                    strategyInfo = maxHeuristic(options, 1);
                 else
-                    this.heuristic = minHeuristic(options);
+                    strategyInfo = maxHeuristic(options, -1);
+
+                this.heuristic = strategyInfo[0];
+                this.gameTime = (int) strategyInfo[1];
             }
             else {
                 this.heuristic = this.state.heuristic();
@@ -58,20 +70,48 @@ public class MonteCarloTree<M> {
             return this.branches.isEmpty();
         }
 
-        private double minHeuristic(double[] options) {
-            double min = options[0];
-            for (int i = 1; i < options.length; i++)
-                min = Math.min(min, options[i]);
+        /*
+         * Returns 1 if the calling node is better for the bot
+         * Returns -1 if the calling node is better for the player
+         * Returns 0 if there is no difference
+         */
+        /*
+         * TODO: Right now, this method assumes that in a tied game the
+         *  bot will want to lengthen the game while the player will want
+         *  to shorten the game. This is a bit of an inconsistency.
+         */
+        public int compareTo(Node n) {
+            if (n == null || this.heuristic > n.heuristic)
+                return 1;
 
-            return min;
+            else if (this.heuristic == n.heuristic) {
+                if (
+                    (this.heuristic > 0 && this.gameTime < n.gameTime) ||
+                    (this.heuristic <= 0 && this.gameTime > n.gameTime)
+                )
+                    return 1;
+
+                else if (this.gameTime == n.gameTime)
+                    return 0;
+
+                else
+                    return -1;
+            }
+
+            return -1;
+
         }
 
-        private double maxHeuristic(double[] options) {
-            double max = options[0];
-            for (int i = 1; i < options.length; i++)
-                max = Math.max(max, options[i]);
 
-            return max;
+        private double[] maxHeuristic(List<Node> options, int compare) {
+            Node max = options.getFirst();
+            for (int i = 1; i < options.size(); i++) {
+                Node n = options.get(i);
+                if ((n.compareTo(max) * compare) > 0)
+                    max = n;
+            }
+
+            return new double[] {max.getHeuristic(), max.getGameTime()};
         }
     }
 

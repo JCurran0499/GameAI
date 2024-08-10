@@ -1,8 +1,7 @@
 package cli;
 
 import agents.Agent;
-import agents.Walker;
-import games.tictactoe.TicTacToe;
+import games.games2d.TicTacToe;
 import resources.MonteCarloTree;
 
 public class TicTacToeCLI extends CommandLineApp<TicTacToe.Move> {

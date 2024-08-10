@@ -3,7 +3,7 @@ package games;
 import org.junit.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import games.tictactoe.TicTacToe;
+import games.games2d.TicTacToe;
 
 public class TicTacToeTest {
     private static TicTacToe game;
@@ -15,7 +15,6 @@ public class TicTacToeTest {
 
         sq1.setAgent("X");
         assertNotEquals(sq1.getAgent(), sq2.getAgent());
-        assertNull(sq2.getAgent());
     }
 
     @Test

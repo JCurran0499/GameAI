@@ -2,7 +2,6 @@ import agents.Agent;
 import agents.*;
 import cli.CommandLineApp;
 import cli.TicTacToeCLI;
-import resources.ConsoleColors;
 
 public class App {
     public static void main(String[] args) {

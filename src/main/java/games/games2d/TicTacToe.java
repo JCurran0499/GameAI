@@ -1,21 +1,20 @@
-package games.tictactoe;
+package games.games2d;
 
 import games.Game2D;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
 import resources.ConsoleColors;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
-    private final boolean playerGoesFirst;
-    private String winner = null;
-    private Square lastPlaced = null;
+    private Square lastPlaced;
 
     public TicTacToe(String playerAgent, boolean playerGoesFirst) {
-        super(3, 3, playerAgent, oppositeAgent(playerAgent));
-        this.playerGoesFirst = playerGoesFirst;
+        super(3, 3, playerAgent, oppositeAgent(playerAgent), playerGoesFirst);
+        this.lastPlaced = null;
     }
 
     protected Square defaultSpace(int r, int c) {
@@ -67,14 +66,9 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
     }
 
     @Override
-    public String winner() {
-        return this.winner;
-    }
-
-    @Override
     public String activeAgent() {
         if (this.lastPlaced == null)
-            return this.playerGoesFirst ? this.playerAgent : oppositeAgent(this.playerAgent);
+            return this.playerGoesFirst ? this.playerAgent : this.botAgent;
 
         else {
             return oppositeAgent(this.lastPlaced.getAgent());
@@ -95,9 +89,7 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
 
     @Override
     public boolean moveLegal(Move move) {
-        String agent = activeAgent();
         return (
-            (agent.equals("X") || agent.equals("O")) &&
             !(move.x < 0 || move.x >= 3) || (move.y < 0 || move.y >= 3) &&
             (this.get(move.x, move.y).free())
         );
@@ -114,6 +106,7 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
         return moves;
     }
 
+    @Override
     public String visualize() {
         StringBuilder visualization = new StringBuilder();
         for (ArrayList<Square> row : this.board) {
@@ -144,11 +137,11 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
         public Square(int row, int col) {
             this.row = row;
             this.col = col;
-            this.agent = null;
+            this.agent = "";
         }
 
         public boolean free() {
-            return this.agent == null;
+            return this.agent.isEmpty();
         }
 
         public String toString() {
@@ -161,7 +154,7 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
         }
 
         private String agentToString(String agent, int index) {
-            if (agent == null)
+            if (agent.isEmpty())
                 return String.valueOf(index);
 
             if (agent.equals("X"))
