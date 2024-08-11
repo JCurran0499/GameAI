@@ -52,14 +52,14 @@ public class MonteCarloTree<M> {
 
             if (!isLeaf()) {
                 List<Node> options = this.branches.values().stream().toList();
-                double[] strategyInfo;
+                Node bestNode;
                 if (this.agent.equals(botAgent))
-                    strategyInfo = maxHeuristic(options, 1);
+                    bestNode = maxHeuristicNode(options, 1);
                 else
-                    strategyInfo = maxHeuristic(options, -1);
+                    bestNode = maxHeuristicNode(options, -1);
 
-                this.heuristic = strategyInfo[0];
-                this.gameTime = (int) strategyInfo[1];
+                this.heuristic = bestNode.heuristic;
+                this.gameTime = bestNode.gameTime;
             }
             else {
                 this.heuristic = this.state.heuristic();
@@ -103,7 +103,7 @@ public class MonteCarloTree<M> {
         }
 
 
-        private double[] maxHeuristic(List<Node> options, int compare) {
+        private Node maxHeuristicNode(List<Node> options, int compare) {
             Node max = options.getFirst();
             for (int i = 1; i < options.size(); i++) {
                 Node n = options.get(i);
@@ -111,7 +111,7 @@ public class MonteCarloTree<M> {
                     max = n;
             }
 
-            return new double[] {max.getHeuristic(), max.getGameTime()};
+            return max;
         }
     }
 
