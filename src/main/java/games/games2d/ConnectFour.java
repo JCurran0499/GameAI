@@ -45,12 +45,30 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
     // ----- Game Methods ----- \\
     @Override
     public boolean gameOver() {
-        int streak = 0;
+        if (this.lastPlaced < 0)
+            return false;
+
+        int streak;
         int r = this.columns[this.lastPlaced];
         int c = this.lastPlaced;
-        Slot slot = this.get(this.columns[this.lastPlaced], this.lastPlaced);
+        String agent = this.get(r, c).getAgent();
 
-        return true;
+        int[][] streakIncrements = new int[][] {
+            {0, 1, 0, -1},
+            {1, 0, -1, 0},
+            {1, 1, -1, -1},
+            {1, -1, -1, 1}
+        };
+
+        for (int[] streakInc : streakIncrements) {
+            streak = measureStreak(r, c, streakInc[0], streakInc[1]) + measureStreak(r, c, streakInc[2], streakInc[3]);
+            if (streak >= 3) {
+                this.winner = agent;
+                return true;
+            }
+        }
+
+        return allMoves().isEmpty();
     }
 
     @Override
@@ -72,21 +90,21 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
 
         ConnectFour newGame = this.copy();
 
-        newGame.columns[move]--;
-        newGame.get(this.columns[move], move).setAgent(activeAgent());
+        newGame.columns[move] = newGame.columns[move] - 1;
+        newGame.get(newGame.columns[move], move).setAgent(activeAgent());
         newGame.lastPlaced = move;
         return newGame;
     }
 
     @Override
     public boolean moveLegal(Integer move) {
-        return (move >= 0 && move < 7 && this.columns[move] > 0);
+        return (move >= 0 && move < COLS && this.columns[move] > 0);
     }
 
     @Override
     public List<Integer> allMoves() {
         List<Integer> moves = new ArrayList<>();
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < this.columns.length; i++)
             if (this.columns[i] > 0)
                 moves.add(i);
 
@@ -96,6 +114,10 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
     @Override
     public String visualize() {
         StringBuilder visualization = new StringBuilder();
+        for (int i = 1; i <= COLS; i++)
+            visualization.append(" ").append(i).append(" ");
+        visualization.append(" ");
+
         for (ArrayList<Slot> row : this.board) {
             visualization.append("\n" + ConsoleColors.WHITE_BACKGROUND + ConsoleColors.BLACK);
             for (Slot slot : row)
@@ -111,6 +133,28 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
             return "B";
         else
             return "R";
+    }
+
+    private int measureStreak(int r, int c, int rIncrement, int cIncrement) {
+        Slot slot = this.get(r, c);
+        String agent = slot.getAgent();
+        int streak = 0;
+
+        r += rIncrement;
+        c += cIncrement;
+        while (
+            r >= 0 && r < ROWS && c>= 0 && c < COLS && streak < 3 &&
+            slot.getAgent() != null && slot.getAgent().equals(agent)
+        ) {
+            slot = this.get(r, c);
+            if (slot.getAgent() != null && slot.getAgent().equals(agent))
+                streak++;
+
+            r += rIncrement;
+            c += cIncrement;
+        }
+
+        return streak;
     }
 
     @Getter

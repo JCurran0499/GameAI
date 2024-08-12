@@ -1,6 +1,7 @@
 import agents.Agent;
 import agents.*;
 import cli.CommandLineApp;
+import cli.ConnectFourCLI;
 import cli.TicTacToeCLI;
 
 public class App {
@@ -38,15 +39,21 @@ public class App {
         boolean valid;
         do {
             System.out.println("\n(1) Tic Tac Toe");
+            System.out.println("(2) Connect Four");
             System.out.print("Choose your game: ");
             try {
                 game = Integer.parseInt(System.console().readLine().strip());
-                valid = (game == 1);
+                valid = (game  > 0 && game <= 2);
             } catch (NumberFormatException | NullPointerException e) {
+                game = -1;
                 valid = false;
             }
         } while (!valid);
 
-        return new TicTacToeCLI(agent);
+        return switch(game) {
+            case 1 -> new TicTacToeCLI(agent);
+            case 2 -> new ConnectFourCLI(agent);
+            default -> null;
+        };
     }
 }

@@ -12,16 +12,15 @@ public class TicTacToeCLI extends CommandLineApp<TicTacToe.Move> {
     }
 
     protected TicTacToe.Move playerMoveChoice() {
-        TicTacToe.Move move;
+        TicTacToe.Move move = null;
         boolean valid;
         do {
             System.out.print("Choose a board space: ");
             try {
                 int space = Integer.parseInt(System.console().readLine().strip());
                 move = new TicTacToe.Move((space - 1) / 3, (space - 1) % 3);
-                valid = ((TicTacToe) game).get(move.x(), move.y()).free();
-            } catch (NullPointerException | NumberFormatException e) {
-                move = null;
+                valid = game.moveLegal(move);
+            } catch (NumberFormatException e) {
                 valid = false;
             }
         } while (!valid);

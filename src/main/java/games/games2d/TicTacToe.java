@@ -10,10 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
+    private static final int ROWS = 3;
+    private static final int COLS = 3;
+
     private Square lastPlaced;
 
     public TicTacToe(String playerAgent, boolean playerGoesFirst) {
-        super(3, 3, playerAgent, oppositeAgent(playerAgent), playerGoesFirst);
+        super(ROWS, COLS, playerAgent, oppositeAgent(playerAgent), playerGoesFirst);
         this.lastPlaced = null;
     }
 
@@ -90,8 +93,8 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
     @Override
     public boolean moveLegal(Move move) {
         return (
-            !(move.x < 0 || move.x >= 3) || (move.y < 0 || move.y >= 3) &&
-            (this.get(move.x, move.y).free())
+            move.x >= 0 && move.x < ROWS && move.y >= 0 && move.y < COLS &&
+            this.get(move.x, move.y).free()
         );
     }
 
