@@ -2,12 +2,9 @@ package resources;
 
 import games.Game;
 import lombok.Getter;
-
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
-import java.lang.Math;
 
 @Getter
 public class MonteCarloTree<M> {

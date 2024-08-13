@@ -19,6 +19,4 @@ public interface Game<M> {
     List<M> allMoves();
 
     double heuristic();
-
-    String visualize();
 }

@@ -33,7 +33,7 @@ public class TicTacToeCLI extends CommandLineApp<TicTacToe.Move> {
         boolean choice;
         do {
             System.out.print("Choose a role (X/O): ");
-            agent = System.console().readLine().strip();
+            agent = System.console().readLine().strip().toUpperCase();
             choice = (agent.equals("X") || agent.equals("O"));
         } while (!choice);
 

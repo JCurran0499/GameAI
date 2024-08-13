@@ -8,7 +8,9 @@ public class App {
     public static void main(String[] args) {
         Agent agent = chooseAgent();
         CommandLineApp<?> app = chooseGame(agent);
-        app.run();
+
+        if (app != null)
+            app.run();
     }
 
     private static Agent chooseAgent() {

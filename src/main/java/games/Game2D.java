@@ -28,8 +28,20 @@ public abstract class Game2D<S, M> implements Game<M> {
         }
     }
 
+    public S get(int r, int c) {
+        try {
+            return this.board.get(r).get(c);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    // enforces return type of move() to the more specific type
+    public abstract Game2D<S, M> move(M move);
+
     protected abstract S defaultSpace(int r, int c);
     public abstract Game2D<S, M> copy();
+    public abstract String visualize();
 
     /*
      * Optional override
@@ -44,14 +56,6 @@ public abstract class Game2D<S, M> implements Game<M> {
         }
 
         return 0;
-    }
-
-    public S get(int r, int c) {
-        try {
-            return this.board.get(r).get(c);
-        } catch (IndexOutOfBoundsException e) {
-            return null;
-        }
     }
 
     public String winner() {

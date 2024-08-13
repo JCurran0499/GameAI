@@ -34,7 +34,7 @@ public class ConnectFourCLI extends CommandLineApp<Integer> {
         boolean choice;
         do {
             System.out.print("Choose a color (R/B): ");
-            agent = System.console().readLine().strip();
+            agent = System.console().readLine().strip().toUpperCase();
             choice = (agent.equals("R") || agent.equals("B"));
         } while (!choice);
 

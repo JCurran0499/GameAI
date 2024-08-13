@@ -1,7 +1,7 @@
 package cli;
 
 import agents.Agent;
-import games.Game;
+import games.Game2D;
 import resources.MonteCarloTree;
 
 import java.util.Random;
@@ -11,7 +11,7 @@ public abstract class CommandLineApp<M> {
 
     protected String playerAgent;
     protected boolean playerGoesFirst;
-    protected Game<M> game;
+    protected Game2D<?, M> game;
     protected MonteCarloTree<M> monteCarloTree;
     protected Agent botAgent;
 
