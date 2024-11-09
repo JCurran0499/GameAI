@@ -18,8 +18,8 @@ public class MonteCarloTree<M> {
         private int gameTime;
 
         private Node(Game<M> state) {
-            this.agent = state.activeAgent();
             this.state = state;
+            this.agent = state.activeAgent();
             this.branches = new LinkedHashMap<>();
 
             this.heuristic = 0;
@@ -31,7 +31,7 @@ public class MonteCarloTree<M> {
                 if (isLeaf() && !this.state.gameOver()) {
                     List<M> allMoves = this.state.allMoves();
                     for (M move : allMoves) {
-                        Game<M> nextState = this.state.move(move);
+                        Game<M> nextState = this.state.copy().move(move);
                         Node child = new Node(nextState);
                         child.gameTime = this.gameTime + 1;
                         this.branches.put(move, child);

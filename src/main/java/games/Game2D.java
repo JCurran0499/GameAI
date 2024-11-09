@@ -40,7 +40,6 @@ public abstract class Game2D<S, M> implements Game<M> {
     public abstract Game2D<S, M> move(M move);
 
     protected abstract S defaultSpace(int r, int c);
-    public abstract Game2D<S, M> copy();
     public abstract String visualize();
 
     /*

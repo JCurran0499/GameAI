@@ -5,6 +5,8 @@ import java.util.List;
 public interface Game<M> {
     String getBotAgent();
 
+    Game<M> copy();
+
     boolean gameOver();
 
     // can assume that gameOver() will always be called before winner()

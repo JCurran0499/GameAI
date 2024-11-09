@@ -1,18 +1,18 @@
 package resources;
 
-import games.games2d.TicTacToe;
+import games.games2d.ConnectFour;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MonteCarloTreeTest {
-    private static TicTacToe game;
-    private static MonteCarloTree<TicTacToe.Move> tree;
+    private static ConnectFour game;
+    private static MonteCarloTree<Integer> tree;
 
     @BeforeAll
     public static void beforeAll() {
-        game = new TicTacToe("X", true);
+        game = new ConnectFour("X", true);
     }
 
     @Test

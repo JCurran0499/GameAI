@@ -83,11 +83,9 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
         if (!moveLegal(move))
             throw new RuntimeException("this move is invalid");
 
-        TicTacToe newGame = this.copy();
-
-        newGame.get(move.x, move.y).setAgent(activeAgent());
-        newGame.lastPlaced = newGame.get(move.x, move.y);
-        return newGame;
+        this.get(move.x, move.y).setAgent(this.activeAgent());
+        this.lastPlaced = this.get(move.x, move.y);
+        return this;
     }
 
     @Override
@@ -156,7 +154,7 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
             return new Square(this.row, this.col, this.agent);
         }
 
-        private String agentToString(String agent, int index) {
+        private static String agentToString(String agent, int index) {
             if (agent.isEmpty())
                 return String.valueOf(index);
 

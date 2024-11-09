@@ -36,7 +36,7 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
         ).toList());
 
         newGame.winner = this.winner;
-        newGame.lastPlaced = lastPlaced;
+        newGame.lastPlaced = this.lastPlaced;
         newGame.columns = Arrays.copyOf(this.columns, COLS);
         newGame.board = newBoard;
         return newGame;
@@ -78,7 +78,7 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
 
         else {
             return oppositeAgent(
-                this.board.get(this.columns[this.lastPlaced]).get(this.lastPlaced).getAgent()
+                this.get(this.columns[this.lastPlaced], this.lastPlaced).getAgent()
             );
         }
     }
@@ -88,12 +88,10 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
         if (!moveLegal(move))
             throw new RuntimeException("this move is invalid");
 
-        ConnectFour newGame = this.copy();
-
-        newGame.columns[move] = newGame.columns[move] - 1;
-        newGame.get(newGame.columns[move], move).setAgent(activeAgent());
-        newGame.lastPlaced = move;
-        return newGame;
+        this.get(columns[move] - 1, move).setAgent(this.activeAgent());
+        columns[move] = columns[move] - 1;
+        lastPlaced = move;
+        return this;
     }
 
     @Override
