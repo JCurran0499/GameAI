@@ -2,9 +2,10 @@ package games;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Game2D<S, M> implements Game<M> {
+public abstract class Game2D<S, M> implements Game<M>, Serializable {
     protected ArrayList<ArrayList<S>> board;
     protected boolean playerGoesFirst;
     protected String winner;

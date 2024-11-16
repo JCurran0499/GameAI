@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import resources.ConsoleColors;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -211,7 +212,7 @@ public class Checkers extends Game2D<Checkers.Square, Checkers.Move> {
     @Getter
     @Setter
     @AllArgsConstructor
-    public static class Square {
+    public static class Square implements Serializable {
         private final int row;
         private final int col;
         private Piece piece;
@@ -258,7 +259,7 @@ public class Checkers extends Game2D<Checkers.Square, Checkers.Move> {
 
     @Getter
     @AllArgsConstructor
-    public static class Piece {
+    public static class Piece implements Serializable {
         private final String agent;
         private boolean king;
 
@@ -278,7 +279,7 @@ public class Checkers extends Game2D<Checkers.Square, Checkers.Move> {
 
     @Getter
     @AllArgsConstructor
-    public static class Move {
+    public static class Move implements Serializable {
         private final int row;
         private final int col;
         private final Direction direction;
@@ -290,7 +291,7 @@ public class Checkers extends Game2D<Checkers.Square, Checkers.Move> {
         }
     }
 
-    public static class Direction  {
+    public static class Direction implements Serializable {
         private final int rChange;
         private final int cChange;
 

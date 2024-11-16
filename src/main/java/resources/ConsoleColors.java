@@ -1,7 +1,6 @@
 package resources;
 
 // https://codehs.com/tutorial/ryan/add-color-with-ansi-in-javascript
-
 public class ConsoleColors {
     public static final String RESET = "\u001b[0m";
     public static final String BLACK = "\u001b[30m";

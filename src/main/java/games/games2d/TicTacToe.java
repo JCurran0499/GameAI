@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.AllArgsConstructor;
 import resources.ConsoleColors;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -130,7 +131,7 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
     @Getter
     @Setter
     @AllArgsConstructor
-    public static class Square {
+    public static class Square implements Serializable {
         private final int row;
         private final int col;
         private String agent;
@@ -165,5 +166,5 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
         }
     }
 
-    public record Move(int x, int y) {}
+    public record Move(int x, int y) implements Serializable {}
 }

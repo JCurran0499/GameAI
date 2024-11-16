@@ -39,7 +39,7 @@ public abstract class GamePanel<M> extends JPanel {
         this.spaces = new ArrayList<>();
         this.botAgent = new Max();
         this.game = newGame();
-        this.monteCarloTree = new MonteCarloTree<>(this.game, 5);
+        this.monteCarloTree = new MonteCarloTree<>(this.game, 3);
         setup();
     }
 

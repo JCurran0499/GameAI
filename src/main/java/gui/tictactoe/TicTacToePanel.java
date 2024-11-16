@@ -71,8 +71,8 @@ public class TicTacToePanel extends GamePanel<TicTacToe.Move> {
 
     private void botMove() {
         TicTacToe.Move botMove = this.botAgent.takeTurn(this.monteCarloTree);
-        TicTacToeSpace space2 = ((TicTacToeSpace) this.spaces.get(botMove.x()).get(botMove.y()));
-        space2.setPlayer(this.game.activeAgent());
+        TicTacToeSpace space = ((TicTacToeSpace) this.spaces.get(botMove.x()).get(botMove.y()));
+        space.setPlayer(this.game.activeAgent());
         this.game = this.game.move(botMove);
     }
 }

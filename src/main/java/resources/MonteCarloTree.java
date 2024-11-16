@@ -1,15 +1,18 @@
 package resources;
 
 import games.Game;
+import games.games2d.TicTacToe;
 import lombok.Getter;
+
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
 @Getter
-public class MonteCarloTree<M> {
+public class MonteCarloTree<M> implements Serializable {
     @Getter
-    public class Node  {
+    public class Node implements Serializable {
         private final String agent;
         private final Game<M> state;
         private final Map<M, Node> branches;
@@ -132,5 +135,19 @@ public class MonteCarloTree<M> {
         this.head = this.head.branches.get(move);
         this.head.instantiate(this.depth);
         this.head.propagateMinMax();
+    }
+
+    public static void serialize(String filePath, MonteCarloTree<?> tree) throws IOException {
+        ObjectOutputStream out = new ObjectOutputStream(
+            new FileOutputStream(filePath)
+        );
+        out.writeObject(tree);
+    }
+
+    public static MonteCarloTree<?> deserialize(String filePath) throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new ObjectInputStream(
+            new FileInputStream(filePath)
+        );
+        return (MonteCarloTree<?>) in.readObject();
     }
 }
