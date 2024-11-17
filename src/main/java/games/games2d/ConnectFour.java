@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import resources.ConsoleColors;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -159,7 +157,7 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
     @Getter
     @Setter
     @AllArgsConstructor
-    public static class Slot implements Serializable {
+    public static class Slot {
         private final int row;
         private final int col;
         private String agent;
