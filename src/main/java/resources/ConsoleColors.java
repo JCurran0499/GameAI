@@ -7,7 +7,6 @@ public class ConsoleColors {
     public static final String RED = "\u001b[38;5;9m";
     public static final String BLUE = "\u001b[38;5;21m";
 
-    public static final String WHITE_BACKGROUND = "\u001B[47m";
-    public static final String GRAY_BACKGROUND = "\u001b[48;5;7m";
-    public static final String LIGHT_RED_BACKGROUND = "\u001b[48;2;255;217;221";
+    public static final String GRAY_BACKGROUND = "\u001b[48;5;248m";
+    public static final String LIGHT_RED_BACKGROUND = "\u001b[48;2;255;217;221m";
 }

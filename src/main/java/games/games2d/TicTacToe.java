@@ -1,37 +1,36 @@
 package games.games2d;
 
 import games.Game2D;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.AllArgsConstructor;
+import resources.PlayerTypes;
 import resources.ConsoleColors;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
+public class TicTacToe extends Game2D<String, TicTacToe.Move> {
     private static final int ROWS = 3;
     private static final int COLS = 3;
 
-    private Square lastPlaced;
+    private Move lastPlaced;
+    
+    // generates copy board
+    private TicTacToe(TicTacToe ttt) {
+        super(null, ttt.winner, ttt.playerTypes, ttt.player1, ttt.player2);
+        this.lastPlaced = ttt.lastPlaced;
+    }
 
-    public TicTacToe(String playerAgent, boolean playerGoesFirst) {
-        super(ROWS, COLS, playerAgent, oppositeAgent(playerAgent), playerGoesFirst);
+    public TicTacToe(String player1) {
+        super(ROWS, COLS, PlayerTypes.TIC_TAC_TOE, player1, (r, c) -> "");
         this.lastPlaced = null;
     }
 
-    protected Square defaultSpace(int r, int c) {
-        return new Square(r, c);
-    }
-
     public TicTacToe copy() {
-        TicTacToe newGame = new TicTacToe(this.playerAgent, this.playerGoesFirst);
+        TicTacToe newGame = new TicTacToe(this);
 
-        ArrayList<ArrayList<Square>> newBoard = new ArrayList<>(this.board.stream().map(
-            row -> new ArrayList<>(row.stream().map(Square::copy).toList())
-        ).toList());
+        String[][] newBoard = new String[ROWS][];
+        for (int i = 0; i < ROWS; i++)
+            newBoard[i] = Arrays.copyOf(this.board[i], COLS);
 
-        newGame.winner = this.winner;
-        newGame.lastPlaced = (lastPlaced == null) ? null : lastPlaced.copy();
         newGame.board = newBoard;
         return newGame;
     }
@@ -42,23 +41,24 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
         if (this.lastPlaced == null)
             return false;
 
-        Move[][] lines = new Move[][] {
-            new Move[] { new Move(-2, -2), new Move(-1, -1), new Move(1, 1), new Move(2, 2)},
-            new Move[] { new Move(2, -2), new Move(1, -1), new Move(-1, 1), new Move(-2, 2)},
-            new Move[] { new Move(-2, 0), new Move(-1, 0), new Move(1, 0), new Move(2, 0)},
-            new Move[] { new Move(0, -2), new Move(0, -1), new Move(0, 1), new Move(0, 2)}
+        int[][][] lines = new int[][][] {
+            new int[][] { new int[]{-2, -2}, new int[]{-1, -1}, new int[]{1, 1}, new int[]{2, 2} },
+            new int[][] { new int[]{2, -2}, new int[]{1, -1}, new int[]{-1, 1}, new int[]{-2, 2} },
+            new int[][] { new int[]{-2, 0}, new int[]{-1, 0}, new int[]{1, 0}, new int[]{2, 0} },
+            new int[][] { new int[]{0, -2}, new int[]{0, -1}, new int[]{0, 1}, new int[]{0, 2} }
         };
 
+        String last = get(this.lastPlaced.r(), this.lastPlaced.c());
         int count;
-        for (Move[] line : lines) {
+        for (int[][] line : lines) {
             count = 0;
-            for (Move xy : line) {
-                Square newPosition = get(this.lastPlaced.getRow() + xy.x, this.lastPlaced.getCol()+ xy.y);
-                if (newPosition != null && !newPosition.free() && newPosition.getAgent().equals(this.lastPlaced.getAgent()))
+            for (int[] xy : line) {
+                String point = get(this.lastPlaced.r() + xy[0], this.lastPlaced.c() + xy[1]);
+                if (point != null && point.equals(last))
                     count += 1;
 
                 if (count >= 2) {
-                    this.winner = this.lastPlaced.getAgent();
+                    this.winner = last;
                     return true;
                 }
             }
@@ -68,40 +68,40 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
     }
 
     @Override
-    public String activeAgent() {
+    public String activePlayer() {
         if (this.lastPlaced == null)
-            return this.playerGoesFirst ? this.playerAgent : this.botAgent;
+            return this.player1;
 
         else {
-            return oppositeAgent(this.lastPlaced.getAgent());
+            return this.playerTypes.opposite(
+                get(this.lastPlaced.r(), this.lastPlaced.c())
+            );
         }
     }
 
     @Override
     public TicTacToe move(Move move) {
-        if (!moveLegal(move))
-            throw new RuntimeException("this move is invalid");
-
-        this.get(move.x, move.y).setAgent(this.activeAgent());
-        this.lastPlaced = this.get(move.x, move.y);
+        set(move.r(), move.c(), activePlayer());
+        this.lastPlaced = move;
         return this;
     }
 
     @Override
     public boolean moveLegal(Move move) {
-        return (
-            move.x >= 0 && move.x < ROWS && move.y >= 0 && move.y < COLS &&
-            this.get(move.x, move.y).free()
-        );
+        if (move == null)
+            return false;
+
+        String space = get(move.r(), move.c());
+        return (space != null && space.isEmpty());
     }
 
     @Override
     public List<Move> allMoves() {
         List<Move> moves = new ArrayList<>();
-        for (ArrayList<Square> row : this.board)
-            for (Square square : row)
-                if (square.free())
-                    moves.add(new Move(square.getRow(), square.getCol()));
+        for (int r = 0; r < ROWS; r++)
+            for (int c = 0; c < COLS; c++)
+                if (get(r, c).isEmpty())
+                    moves.add(new Move(r, c));
 
         return moves;
     }
@@ -109,60 +109,28 @@ public class TicTacToe extends Game2D<TicTacToe.Square, TicTacToe.Move> {
     @Override
     public String visualize() {
         StringBuilder visualization = new StringBuilder();
-        for (ArrayList<Square> row : this.board) {
-        visualization.append("\n" + ConsoleColors.WHITE_BACKGROUND + ConsoleColors.BLACK);
-            for (Square square : row)
-                visualization.append("[").append(square.toString()).append("]");
+        for (int r = 0; r < ROWS; r++) {
+        visualization.append("\n" + ConsoleColors.GRAY_BACKGROUND + ConsoleColors.BLACK);
+            for (int c = 0; c < COLS; c++) {
+                visualization.append("[").append(
+                    visualizeSpace(get(r, c), r, c)
+                ).append("]");
+            }
             visualization.append(ConsoleColors.RESET);
         }
 
         return visualization.toString();
     }
+    
+    private String visualizeSpace(String player, int row, int col) {
+        if (player.isEmpty())
+            return String.valueOf((row * 3) + col + 1);
 
-    private static String oppositeAgent(String agent) {
-        if (agent.equals("X"))
-            return "O";
+        if (player.equals("X"))
+            return ConsoleColors.BLUE + player + ConsoleColors.RESET + ConsoleColors.GRAY_BACKGROUND + ConsoleColors.BLACK;
         else
-            return "X";
+            return ConsoleColors.RED + player + ConsoleColors.RESET + ConsoleColors.GRAY_BACKGROUND + ConsoleColors.BLACK;
     }
 
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    public static class Square {
-        private final int row;
-        private final int col;
-        private String agent;
-
-        public Square(int row, int col) {
-            this.row = row;
-            this.col = col;
-            this.agent = "";
-        }
-
-        public boolean free() {
-            return this.agent.isEmpty();
-        }
-
-        public String toString() {
-            int squareIndex = (this.getRow() * 3) + this.getCol() + 1;
-            return agentToString(this.agent, squareIndex);
-        }
-
-        public Square copy() {
-            return new Square(this.row, this.col, this.agent);
-        }
-
-        private static String agentToString(String agent, int index) {
-            if (agent.isEmpty())
-                return String.valueOf(index);
-
-            if (agent.equals("X"))
-                return ConsoleColors.BLUE + agent + ConsoleColors.RESET + ConsoleColors.WHITE_BACKGROUND + ConsoleColors.BLACK;
-            else
-                return ConsoleColors.RED + agent + ConsoleColors.RESET + ConsoleColors.WHITE_BACKGROUND + ConsoleColors.BLACK;
-        }
-    }
-
-    public record Move(int x, int y) {}
+    public record Move(int r, int c) {}
 }

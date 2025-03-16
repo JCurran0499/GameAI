@@ -3,6 +3,7 @@ package gui.connect4;
 import games.Game2D;
 import games.games2d.ConnectFour;
 import gui.GamePanel;
+import resources.PlayerTypes;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -12,9 +13,9 @@ public class ConnectFourPanel extends GamePanel<Integer> {
     private final int[] openRows;
 
     public ConnectFourPanel() {
-        super("Connect Four", 6, 7);
+        super("Connect Four", PlayerTypes.CONNECT_FOUR, 6, 7, 5);
         this.openRows = new int[] {5, 5, 5, 5, 5, 5, 5};
-        if (!game.activeAgent().equals(playerAgent))
+        if (!game.activePlayer().equals(player))
             botMove();
     }
 
@@ -36,7 +37,7 @@ public class ConnectFourPanel extends GamePanel<Integer> {
             if (game.winner() == null) {
                 this.getDraw().run();
             } else {
-                if (game.winner().equals(this.playerAgent))
+                if (game.winner().equals(this.player))
                     this.getWin().run();
                 else
                     this.getLose().run();
@@ -50,13 +51,16 @@ public class ConnectFourPanel extends GamePanel<Integer> {
     }
 
     @Override
-    protected String playerAgentChoice() {
+    protected String playerChoice() {
         return "B";
     }
 
     @Override
-    protected Game2D<?, Integer> newGame() {
-        return new ConnectFour(this.playerAgent, this.playerGoesFirst);
+    protected ConnectFour newGame() {
+        if (this.playerGoesFirst)
+            return new ConnectFour(this.player);
+        else
+            return new ConnectFour(this.playerTypes.opposite(this.player));
     }
 
     @Override
@@ -68,7 +72,7 @@ public class ConnectFourPanel extends GamePanel<Integer> {
     }
 
     private void playerMove(ConnectFourSpace space) {
-        space.setPlayer(this.game.activeAgent());
+        space.setPlayer(this.game.activePlayer());
         Integer playerMove = space.getColumn();
         this.game = this.game.move(playerMove);
         this.monteCarloTree.move(playerMove);
@@ -82,7 +86,7 @@ public class ConnectFourPanel extends GamePanel<Integer> {
     private void botMove() {
         Integer botMove = this.botAgent.takeTurn(this.monteCarloTree);
         ConnectFourSpace space = ((ConnectFourSpace) this.spaces.get(openRows[botMove]).get(botMove));
-        space.setPlayer(this.game.activeAgent());
+        space.setPlayer(this.game.activePlayer());
         this.game = this.game.move(botMove);
 
         openRows[botMove] = openRows[botMove] - 1;

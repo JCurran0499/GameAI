@@ -5,6 +5,8 @@ import games.Game2D;
 import lombok.Getter;
 import lombok.Setter;
 import resources.MonteCarloTree;
+import resources.PlayerTypes;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -22,24 +24,26 @@ public abstract class GamePanel<M> extends JPanel {
 
     protected final int rows;
     protected final int cols;
-    protected String playerAgent;
+    protected final PlayerTypes playerTypes;
+    protected String player;
     protected boolean playerGoesFirst;
     protected List<List<JButton>> spaces;
     protected Game2D<?, M> game;
     protected MonteCarloTree<M> monteCarloTree;
     protected Agent botAgent;
 
-    public GamePanel(String title, int rows, int cols) {
+    public GamePanel(String title, PlayerTypes playerTypes, int rows, int cols, int depth) {
         super();
         this.title = title;
         this.rows = rows;
         this.cols = cols;
-        this.playerAgent = playerAgentChoice();
+        this.playerTypes = playerTypes;
+        this.player = playerChoice();
         this.playerGoesFirst = random.nextBoolean();
         this.spaces = new ArrayList<>();
         this.botAgent = new Max();
         this.game = newGame();
-        this.monteCarloTree = new MonteCarloTree<>(this.game, 3);
+        this.monteCarloTree = new MonteCarloTree<>(this.game, this.playerTypes.opposite(this.player), depth);
         setup();
     }
 
@@ -61,7 +65,7 @@ public abstract class GamePanel<M> extends JPanel {
 
     public abstract void actionListener(ActionEvent e);
     public abstract GamePanel<M> copy();
-    protected abstract String playerAgentChoice();
+    protected abstract String playerChoice();
     protected abstract Game2D<?, M> newGame();
     protected abstract JButton newSpace(int r, int c);
 }

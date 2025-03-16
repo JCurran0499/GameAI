@@ -1,16 +1,17 @@
 package gui.tictactoe;
 
-import games.Game2D;
 import games.games2d.TicTacToe;
 import gui.GamePanel;
+import resources.PlayerTypes;
+
 import java.util.List;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 public class TicTacToePanel extends GamePanel<TicTacToe.Move> {
     public TicTacToePanel() {
-        super("Tic Tac Toe", 3, 3);
-        if (!game.activeAgent().equals(playerAgent))
+        super("Tic Tac Toe", PlayerTypes.TIC_TAC_TOE, 3, 3, 5);
+        if (!game.activePlayer().equals(player))
             botMove();
     }
 
@@ -33,7 +34,7 @@ public class TicTacToePanel extends GamePanel<TicTacToe.Move> {
                 if (game.winner() == null) {
                     this.getDraw().run();
                 } else {
-                    if (game.winner().equals(this.playerAgent))
+                    if (game.winner().equals(this.player))
                         this.getWin().run();
                     else
                         this.getLose().run();
@@ -48,13 +49,16 @@ public class TicTacToePanel extends GamePanel<TicTacToe.Move> {
     }
 
     @Override
-    protected String playerAgentChoice() {
+    protected String playerChoice() {
         return "O";
     }
 
     @Override
-    protected Game2D<?, TicTacToe.Move> newGame() {
-        return new TicTacToe(this.playerAgent, this.playerGoesFirst);
+    protected TicTacToe newGame() {
+        if (this.playerGoesFirst)
+            return new TicTacToe(this.player);
+        else
+            return new TicTacToe(this.playerTypes.opposite(this.player));
     }
 
     @Override
@@ -63,7 +67,7 @@ public class TicTacToePanel extends GamePanel<TicTacToe.Move> {
     }
 
     private void playerMove(TicTacToeSpace space) {
-        space.setPlayer(this.game.activeAgent());
+        space.setPlayer(this.game.activePlayer());
         TicTacToe.Move playerMove = new TicTacToe.Move(space.getRow(), space.getCol());
         this.game = this.game.move(playerMove);
         this.monteCarloTree.move(playerMove);
@@ -71,8 +75,8 @@ public class TicTacToePanel extends GamePanel<TicTacToe.Move> {
 
     private void botMove() {
         TicTacToe.Move botMove = this.botAgent.takeTurn(this.monteCarloTree);
-        TicTacToeSpace space = ((TicTacToeSpace) this.spaces.get(botMove.x()).get(botMove.y()));
-        space.setPlayer(this.game.activeAgent());
+        TicTacToeSpace space = ((TicTacToeSpace) this.spaces.get(botMove.r()).get(botMove.c()));
+        space.setPlayer(this.game.activePlayer());
         this.game = this.game.move(botMove);
     }
 }

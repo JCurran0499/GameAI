@@ -3,22 +3,21 @@ package games;
 import java.util.List;
 
 public interface Game<M> {
-    String getBotAgent();
+    // it is client responsibility to verify a move is legal before calling this method
+    Game<M> move(M move);
 
-    Game<M> copy();
+    List<M> allMoves();
+
+    boolean moveLegal(M move);
 
     boolean gameOver();
 
     // can assume that gameOver() will always be called before winner()
     String winner();
 
-    String activeAgent();
+    Game<M> copy();
 
-    Game<M> move(M move);
+    String activePlayer();
 
-    boolean moveLegal(M move);
-
-    List<M> allMoves();
-
-    double heuristic();
+    double heuristic(String bot);
 }

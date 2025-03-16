@@ -19,7 +19,7 @@ public class MonteCarloTree<M> {
 
         private Node(Game<M> state) {
             this.state = state;
-            this.agent = state.activeAgent();
+            this.agent = state.activePlayer();
             this.branches = new LinkedHashMap<>();
 
             this.heuristic = 0;
@@ -50,7 +50,7 @@ public class MonteCarloTree<M> {
             if (!isLeaf()) {
                 List<Node> options = this.branches.values().stream().toList();
                 Node bestNode;
-                if (this.agent.equals(botAgent))
+                if (this.agent.equals(botPlayer))
                     bestNode = maxHeuristicNode(options, 1);
                 else
                     bestNode = maxHeuristicNode(options, -1);
@@ -59,7 +59,7 @@ public class MonteCarloTree<M> {
                 this.gameTime = bestNode.gameTime;
             }
             else {
-                this.heuristic = this.state.heuristic();
+                this.heuristic = this.state.heuristic(botPlayer);
             }
         }
 
@@ -113,12 +113,12 @@ public class MonteCarloTree<M> {
     }
 
     private Node head;
-    private final String botAgent;
+    private final String botPlayer;
     private final int depth;
 
-    public MonteCarloTree(Game<M> initialState, int depth) {
+    public MonteCarloTree(Game<M> initialState, String botPlayer, int depth) {
         this.head = new Node(initialState);
-        this.botAgent = initialState.getBotAgent();
+        this.botPlayer = botPlayer;
         this.depth = depth;
 
         this.head.instantiate(depth);

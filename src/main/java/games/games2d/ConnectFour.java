@@ -1,42 +1,41 @@
 package games.games2d;
 
 import games.Game2D;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import resources.ConsoleColors;
+import resources.PlayerTypes;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
+public class ConnectFour extends Game2D<String, Integer> {
     private static final int ROWS = 6;
     private static final int COLS = 7;
 
     private int lastPlaced;
-    private int[] columns;
+    private final int[] columns; // for each column, the lowest row index with piece
 
-    public ConnectFour(String playerAgent, boolean playerGoesFirst) {
-        super(ROWS, COLS, playerAgent, oppositeAgent(playerAgent), playerGoesFirst);
+    // generates copy board
+    private ConnectFour(ConnectFour c4) {
+        super(null, c4.winner, c4.playerTypes, c4.player1, c4.player2);
+        this.lastPlaced = c4.lastPlaced;
+        this.columns = Arrays.copyOf(c4.columns, COLS);
+    }
+
+    public ConnectFour(String player1) {
+        super(ROWS, COLS, PlayerTypes.CONNECT_FOUR, player1, (r, c) -> "");
         this.lastPlaced = -1;
         this.columns = new int[COLS];
         Arrays.fill(this.columns, ROWS);
     }
 
-    protected Slot defaultSpace(int r, int c) {
-        return new Slot(r, c);
-    }
-
     public ConnectFour copy() {
-        ConnectFour newGame = new ConnectFour(this.playerAgent, this.playerGoesFirst);
+        ConnectFour newGame = new ConnectFour(this);
 
-        ArrayList<ArrayList<Slot>> newBoard = new ArrayList<>(this.board.stream().map(
-            row -> new ArrayList<>(row.stream().map(Slot::copy).toList())
-        ).toList());
+        String[][] newBoard = new String[ROWS][];
+        for (int i = 0; i < ROWS; i++)
+            newBoard[i] = Arrays.copyOf(this.board[i], COLS);
 
-        newGame.winner = this.winner;
-        newGame.lastPlaced = this.lastPlaced;
-        newGame.columns = Arrays.copyOf(this.columns, COLS);
         newGame.board = newBoard;
         return newGame;
     }
@@ -50,7 +49,7 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
         int streak;
         int r = this.columns[this.lastPlaced];
         int c = this.lastPlaced;
-        String agent = this.get(r, c).getAgent();
+        String player = get(r, c);
 
         int[][] streakIncrements = new int[][] {
             {0, 1, 0, -1},
@@ -62,7 +61,7 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
         for (int[] streakInc : streakIncrements) {
             streak = measureStreak(r, c, streakInc[0], streakInc[1]) + measureStreak(r, c, streakInc[2], streakInc[3]);
             if (streak >= 3) {
-                this.winner = agent;
+                this.winner = player;
                 return true;
             }
         }
@@ -71,23 +70,20 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
     }
 
     @Override
-    public String activeAgent() {
+    public String activePlayer() {
         if (this.lastPlaced < 0)
-            return this.playerGoesFirst ? this.playerAgent : this.botAgent;
+            return this.player1;
 
         else {
-            return oppositeAgent(
-                this.get(this.columns[this.lastPlaced], this.lastPlaced).getAgent()
+            return this.playerTypes.opposite(
+                get(this.columns[this.lastPlaced], this.lastPlaced)
             );
         }
     }
 
     @Override
     public ConnectFour move(Integer move) {
-        if (!moveLegal(move))
-            throw new RuntimeException("this move is invalid");
-
-        this.get(columns[move] - 1, move).setAgent(this.activeAgent());
+        set(columns[move] - 1, move, activePlayer());
         columns[move] = columns[move] - 1;
         lastPlaced = move;
         return this;
@@ -115,36 +111,40 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
             visualization.append(" ").append(i).append(" ");
         visualization.append(" ");
 
-        for (ArrayList<Slot> row : this.board) {
-            visualization.append("\n" + ConsoleColors.WHITE_BACKGROUND + ConsoleColors.BLACK);
-            for (Slot slot : row)
-                visualization.append("[").append(slot.toString()).append("]");
+        for (String[] row : this.board) {
+            visualization.append("\n" + ConsoleColors.GRAY_BACKGROUND + ConsoleColors.BLACK);
+            for (String slot : row)
+                visualization.append("[").append(
+                    visualizeSlot(slot)
+                ).append("]");
             visualization.append(ConsoleColors.RESET);
         }
 
         return visualization.toString();
     }
 
-    private static String oppositeAgent(String agent) {
-        if (agent.equals("R"))
-            return "B";
+    private String visualizeSlot(String player) {
+        if (player.isEmpty())
+            return " ";
+
+        if (player.equals("B"))
+            return ConsoleColors.BLUE + "O" + ConsoleColors.RESET + ConsoleColors.GRAY_BACKGROUND + ConsoleColors.BLACK;
         else
-            return "R";
+            return ConsoleColors.RED + "O" + ConsoleColors.RESET + ConsoleColors.GRAY_BACKGROUND + ConsoleColors.BLACK;
     }
 
     private int measureStreak(int r, int c, int rIncrement, int cIncrement) {
-        Slot slot = this.get(r, c);
-        String agent = slot.getAgent();
+        String player, temp;
+        player = temp = get(r, c);
         int streak = 0;
 
         r += rIncrement;
         c += cIncrement;
         while (
-            r >= 0 && r < ROWS && c>= 0 && c < COLS && streak < 3 &&
-            slot.getAgent() != null && slot.getAgent().equals(agent)
+            temp != null && temp.equals(player)
         ) {
-            slot = this.get(r, c);
-            if (slot.getAgent() != null && slot.getAgent().equals(agent))
+            temp = get(r, c);
+            if (temp != null && temp.equals(player))
                 streak++;
 
             r += rIncrement;
@@ -152,38 +152,5 @@ public class ConnectFour extends Game2D<ConnectFour.Slot, Integer> {
         }
 
         return streak;
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    public static class Slot {
-        private final int row;
-        private final int col;
-        private String agent;
-
-        public Slot(int row, int col) {
-            this.row = row;
-            this.col = col;
-            this.agent = null;
-        }
-
-        public String toString() {
-            return agentToString(this.agent);
-        }
-
-        public Slot copy() {
-            return new Slot(this.row, this.col, this.agent);
-        }
-
-        private String agentToString(String agent) {
-            if (agent == null)
-                return " ";
-
-            if (agent.equals("B"))
-                return ConsoleColors.BLUE + "O" + ConsoleColors.RESET + ConsoleColors.WHITE_BACKGROUND + ConsoleColors.BLACK;
-            else
-                return ConsoleColors.RED + "O" + ConsoleColors.RESET + ConsoleColors.WHITE_BACKGROUND + ConsoleColors.BLACK;
-        }
     }
 }
