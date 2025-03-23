@@ -2,26 +2,11 @@ package cli;
 
 import agents.Agent;
 import games.games2d.Checkers;
-import resources.PlayerTypes;
-
 import java.util.Scanner;
-import java.util.Set;
 
 public class CheckersCLI extends CommandLineApp<Checkers.Move> {
-    private static final Set<Character> columns = Set.of(
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'
-    );
-
     public CheckersCLI(Agent botAgent, Scanner scanner) {
-        super(botAgent, PlayerTypes.CHECKERS, 3, scanner);
-    }
-
-    @Override
-    protected Checkers newGame() {
-        if (this.playerGoesFirst)
-            return new Checkers(this.player);
-        else
-            return new Checkers(this.playerTypes.opposite(this.player));
+        super(botAgent, 3, scanner, Checkers::new);
     }
 
     @Override

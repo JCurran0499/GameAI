@@ -1,7 +1,7 @@
 package games.games2d;
 
 import games.Game2D;
-import resources.PlayerTypes;
+import resources.Players;
 import resources.ConsoleColors;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,12 +15,12 @@ public class TicTacToe extends Game2D<String, TicTacToe.Move> {
     
     // generates copy board
     private TicTacToe(TicTacToe ttt) {
-        super(null, ttt.winner, ttt.playerTypes, ttt.player1, ttt.player2);
+        super(null, ttt.winner, ttt.players);
         this.lastPlaced = ttt.lastPlaced;
     }
 
-    public TicTacToe(String player1) {
-        super(ROWS, COLS, PlayerTypes.TIC_TAC_TOE, player1, (r, c) -> "");
+    public TicTacToe() {
+        super(ROWS, COLS, Players.TIC_TAC_TOE, (r, c) -> "");
         this.lastPlaced = null;
     }
 
@@ -70,10 +70,10 @@ public class TicTacToe extends Game2D<String, TicTacToe.Move> {
     @Override
     public String activePlayer() {
         if (this.lastPlaced == null)
-            return this.player1;
+            return this.players.player1();
 
         else {
-            return this.playerTypes.opposite(
+            return this.players.opposite(
                 get(this.lastPlaced.r(), this.lastPlaced.c())
             );
         }
@@ -127,9 +127,9 @@ public class TicTacToe extends Game2D<String, TicTacToe.Move> {
             return String.valueOf((row * 3) + col + 1);
 
         if (player.equals("X"))
-            return ConsoleColors.BLUE + player + ConsoleColors.RESET + ConsoleColors.GRAY_BACKGROUND + ConsoleColors.BLACK;
-        else
             return ConsoleColors.RED + player + ConsoleColors.RESET + ConsoleColors.GRAY_BACKGROUND + ConsoleColors.BLACK;
+        else
+            return ConsoleColors.BLUE + player + ConsoleColors.RESET + ConsoleColors.GRAY_BACKGROUND + ConsoleColors.BLACK;
     }
 
     public record Move(int r, int c) {}

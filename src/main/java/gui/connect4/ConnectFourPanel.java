@@ -1,9 +1,7 @@
 package gui.connect4;
 
-import games.Game2D;
 import games.games2d.ConnectFour;
 import gui.GamePanel;
-import resources.PlayerTypes;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -13,7 +11,7 @@ public class ConnectFourPanel extends GamePanel<Integer> {
     private final int[] openRows;
 
     public ConnectFourPanel() {
-        super("Connect Four", PlayerTypes.CONNECT_FOUR, 6, 7, 5);
+        super("Connect Four", 6, 7, 5, ConnectFour::new);
         this.openRows = new int[] {5, 5, 5, 5, 5, 5, 5};
         if (!game.activePlayer().equals(player))
             botMove();
@@ -48,19 +46,6 @@ public class ConnectFourPanel extends GamePanel<Integer> {
     @Override
     public ConnectFourPanel copy() {
         return new ConnectFourPanel();
-    }
-
-    @Override
-    protected String playerChoice() {
-        return "B";
-    }
-
-    @Override
-    protected ConnectFour newGame() {
-        if (this.playerGoesFirst)
-            return new ConnectFour(this.player);
-        else
-            return new ConnectFour(this.playerTypes.opposite(this.player));
     }
 
     @Override

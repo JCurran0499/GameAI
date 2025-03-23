@@ -60,7 +60,7 @@ public class App {
             }
         } while (!valid);
 
-        return switch(game) {
+        return switch (game) {
             case 1 -> new TicTacToeCLI(agent, scanner);
             case 2 -> new ConnectFourCLI(agent, scanner);
             case 3 -> new CheckersCLI(agent, scanner);

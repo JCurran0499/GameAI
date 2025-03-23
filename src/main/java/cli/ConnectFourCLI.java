@@ -2,21 +2,13 @@ package cli;
 
 import agents.Agent;
 import games.games2d.ConnectFour;
-import resources.PlayerTypes;
+import resources.Players;
 
 import java.util.Scanner;
 
 public class ConnectFourCLI extends CommandLineApp<Integer> {
     public ConnectFourCLI(Agent botAgent, Scanner scanner) {
-        super(botAgent, PlayerTypes.CONNECT_FOUR, 5, scanner);
-    }
-
-    @Override
-    protected ConnectFour newGame() {
-        if (this.playerGoesFirst)
-            return new ConnectFour(this.player);
-        else
-            return new ConnectFour(this.playerTypes.opposite(this.player));
+        super(botAgent, 5, scanner, ConnectFour::new);
     }
 
     @Override

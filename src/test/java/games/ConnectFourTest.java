@@ -2,7 +2,6 @@ package games;
 
 import games.games2d.ConnectFour;
 import org.junit.Test;
-
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,10 +11,8 @@ public class ConnectFourTest {
 
     @Test
     public void gameInstantiation() {
-        game = new ConnectFour("R");
+        game = new ConnectFour();
         assertEquals("R", game.activePlayer());
-        assertEquals("R", game.player1);
-        assertEquals("B", game.player2);
 
         for (int r = 0; r < 6; r++)
             for (int c = 0; c < 7; c++)
@@ -23,46 +20,8 @@ public class ConnectFourTest {
     }
 
     @Test
-    public void gameInstantiationOtherPlayer() {
-        game = new ConnectFour("B");
-        assertEquals("B", game.activePlayer());
-        assertEquals("B", game.player1);
-        assertEquals("R", game.player2);
-    }
-
-    @Test
-    public void invalidGameInstantiation() {
-        try {
-            game = new ConnectFour("r");
-        } catch (RuntimeException e) {
-            assertEquals("invalid player configuration", e.getMessage());
-        }
-
-        try {
-            game = new ConnectFour("X");
-        } catch (RuntimeException e) {
-            assertEquals("invalid player configuration", e.getMessage());
-        }
-
-        try {
-            game = new ConnectFour("invalid");
-        } catch (RuntimeException e) {
-            assertEquals("invalid player configuration", e.getMessage());
-        }
-    }
-
-    @Test
-    public void nullInstantiation() {
-        try {
-            game = new ConnectFour(null);
-        } catch (RuntimeException e) {
-            assertEquals("invalid player configuration", e.getMessage());
-        }
-    }
-
-    @Test
     public void gameCopy() {
-        game = new ConnectFour("R");
+        game = new ConnectFour();
         game.move(3);
         game.move(4);
         game.move(4);
@@ -89,7 +48,7 @@ public class ConnectFourTest {
 
     @Test
     public void gameNotOver() {
-        game = new ConnectFour("R");
+        game = new ConnectFour();
         assertFalse(game.gameOver());
 
         game.move(0).move(3).move(0).move(6).move(5).move(4).move(0);
@@ -104,7 +63,7 @@ public class ConnectFourTest {
 
     @Test
     public void gameOverHorizontal() {
-        game = new ConnectFour("R")
+        game = new ConnectFour()
             .move(3).move(6).move(1).move(0).move(0)
             .move(6).move(4).move(3).move(2);
 
@@ -114,7 +73,7 @@ public class ConnectFourTest {
 
     @Test
     public void gameOverUpperHorizontal() {
-        game = new ConnectFour("R")
+        game = new ConnectFour()
             .move(2).move(3).move(4).move(2).move(0)
             .move(4).move(1).move(3).move(5).move(5);
 
@@ -124,27 +83,27 @@ public class ConnectFourTest {
 
     @Test
     public void gameOverVertical() {
-        game = new ConnectFour("B")
+        game = new ConnectFour()
             .move(0).move(1).move(2).move(2).move(4)
             .move(2).move(0).move(2).move(0).move(2);
-
-        assertTrue(game.gameOver());
-        assertEquals("R", game.winner());
-    }
-
-    @Test
-    public void gameOverVerticalRight() {
-        game = new ConnectFour("B")
-            .move(6).move(5).move(6).move(5).move(6)
-            .move(5).move(6);
 
         assertTrue(game.gameOver());
         assertEquals("B", game.winner());
     }
 
     @Test
+    public void gameOverVerticalRight() {
+        game = new ConnectFour()
+            .move(6).move(5).move(6).move(5).move(6)
+            .move(5).move(6);
+
+        assertTrue(game.gameOver());
+        assertEquals("R", game.winner());
+    }
+
+    @Test
     public void gameOverDiagonalLeftRight() {
-        game = new ConnectFour("R");
+        game = new ConnectFour();
         assertFalse(game.gameOver());
 
         game.move(0).move(1).move(1).move(2).move(3)
@@ -157,19 +116,19 @@ public class ConnectFourTest {
 
     @Test
     public void gameOverDiagonalRightLeft() {
-        game = new ConnectFour("B")
+        game = new ConnectFour()
             .move(0).move(1).move(0).move(0).move(0)
             .move(0).move(1).move(3).move(3).move(0)
             .move(2).move(2).move(2).move(2).move(1)
             .move(3).move(1).move(1);
 
         assertTrue(game.gameOver());
-        assertEquals("R", game.winner());
+        assertEquals("B", game.winner());
     }
 
     @Test
     public void gameOverDraw() {
-        game = new ConnectFour("R");
+        game = new ConnectFour();
         game.move(0).move(1).move(2).move(3).move(4).move(5).move(6);
         assertFalse(game.gameOver());
 
@@ -192,7 +151,7 @@ public class ConnectFourTest {
 
     @Test
     public void gameActivePlayer() {
-        game = new ConnectFour("R");
+        game = new ConnectFour();
         assertEquals("R", game.activePlayer());
 
         game.move(1);
@@ -208,7 +167,7 @@ public class ConnectFourTest {
 
     @Test
     public void gameMove() {
-        game = new ConnectFour("R");
+        game = new ConnectFour();
         for (int r = 0; r < 6; r++)
             for (int c = 0; c < 7; c++)
                 assertEquals("", game.get(r, c));
@@ -222,7 +181,7 @@ public class ConnectFourTest {
 
     @Test
     public void gameMoveLegal() {
-        game = new ConnectFour("R");
+        game = new ConnectFour();
 
         assertTrue(game.moveLegal(0));
         assertTrue(game.moveLegal(1));
@@ -236,7 +195,7 @@ public class ConnectFourTest {
 
     @Test
     public void moveNotLegalBounds() {
-        game = new ConnectFour("R");
+        game = new ConnectFour();
         assertFalse(game.moveLegal(-1));
         assertFalse(game.moveLegal(7));
         assertFalse(game.moveLegal(8));
@@ -244,7 +203,7 @@ public class ConnectFourTest {
 
     @Test
     public void moveNotLegalFullColumn() {
-        game = new ConnectFour("R")
+        game = new ConnectFour()
             .move(5).move(5).move(5).move(5).move(5).move(4);
 
         assertTrue(game.moveLegal(5));
@@ -255,7 +214,7 @@ public class ConnectFourTest {
 
     @Test
     public void gameAllMoves() {
-        game = new ConnectFour("R")
+        game = new ConnectFour()
             .move(0).move(0).move(2).move(3);
 
         List<Integer> moves = game.allMoves();
@@ -266,7 +225,7 @@ public class ConnectFourTest {
 
     @Test
     public void allMovesSomeMoves() {
-        game = new ConnectFour("R")
+        game = new ConnectFour()
             .move(0).move(0).move(0).move(0).move(0).move(0)
             .move(2).move(2).move(2).move(2).move(2).move(2)
             .move(5).move(5).move(5).move(5).move(5).move(5);
@@ -280,7 +239,7 @@ public class ConnectFourTest {
 
     @Test
     public void allMovesGameOver() {
-        game = new ConnectFour("R");
+        game = new ConnectFour();
 
         game.move(0).move(1).move(2).move(3).move(4).move(5).move(6);
         game.move(0).move(1).move(2).move(3).move(4).move(5).move(6);

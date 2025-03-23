@@ -2,7 +2,7 @@ package games.games2d;
 
 import games.Game2D;
 import resources.ConsoleColors;
-import resources.PlayerTypes;
+import resources.Players;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,13 +17,13 @@ public class ConnectFour extends Game2D<String, Integer> {
 
     // generates copy board
     private ConnectFour(ConnectFour c4) {
-        super(null, c4.winner, c4.playerTypes, c4.player1, c4.player2);
+        super(null, c4.winner, c4.players);
         this.lastPlaced = c4.lastPlaced;
         this.columns = Arrays.copyOf(c4.columns, COLS);
     }
 
-    public ConnectFour(String player1) {
-        super(ROWS, COLS, PlayerTypes.CONNECT_FOUR, player1, (r, c) -> "");
+    public ConnectFour() {
+        super(ROWS, COLS, Players.CONNECT_FOUR, (r, c) -> "");
         this.lastPlaced = -1;
         this.columns = new int[COLS];
         Arrays.fill(this.columns, ROWS);
@@ -72,10 +72,10 @@ public class ConnectFour extends Game2D<String, Integer> {
     @Override
     public String activePlayer() {
         if (this.lastPlaced < 0)
-            return this.player1;
+            return this.players.player1();
 
         else {
-            return this.playerTypes.opposite(
+            return this.players.opposite(
                 get(this.columns[this.lastPlaced], this.lastPlaced)
             );
         }

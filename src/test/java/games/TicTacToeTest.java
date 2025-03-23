@@ -17,10 +17,8 @@ public class TicTacToeTest {
 
     @Test
     public void gameInstantiation() {
-        game = new TicTacToe("X");
+        game = new TicTacToe();
         assertEquals("X", game.activePlayer());
-        assertEquals("X", game.player1);
-        assertEquals("O", game.player2);
 
         assertTrue(game.get(0, 0).isEmpty());
         assertTrue(game.get(1, 0).isEmpty());
@@ -29,46 +27,8 @@ public class TicTacToeTest {
     }
 
     @Test
-    public void gameInstantiationOtherPlayer() {
-        game = new TicTacToe("O");
-        assertEquals("O", game.activePlayer());
-        assertEquals("O", game.player1);
-        assertEquals("X", game.player2);
-    }
-
-    @Test
-    public void invalidGameInstantiation() {
-        try {
-            game = new TicTacToe("o");
-        } catch (RuntimeException e) {
-            assertEquals("invalid player configuration", e.getMessage());
-        }
-
-        try {
-            game = new TicTacToe("A");
-        } catch (RuntimeException e) {
-            assertEquals("invalid player configuration", e.getMessage());
-        }
-
-        try {
-            game = new TicTacToe("invalid");
-        } catch (RuntimeException e) {
-            assertEquals("invalid player configuration", e.getMessage());
-        }
-    }
-
-    @Test
-    public void nullInstantiation() {
-        try {
-            game = new TicTacToe(null);
-        } catch (RuntimeException e) {
-            assertEquals("invalid player configuration", e.getMessage());
-        }
-    }
-
-    @Test
     public void gameCopy() {
-        game = new TicTacToe("X");
+        game = new TicTacToe();
         game.move(moves[0][0]);
         TicTacToe game2 = game.copy();
 
@@ -85,7 +45,7 @@ public class TicTacToeTest {
 
     @Test
     public void gameNotOver() {
-        game = new TicTacToe("X")
+        game = new TicTacToe()
             .move(moves[1][1]).move(moves[0][1]).move(moves[0][0])
             .move(moves[0][2]).move(moves[2][0]).move(moves[2][2]);
         assertFalse(game.gameOver());
@@ -96,7 +56,7 @@ public class TicTacToeTest {
 
     @Test
     public void gameOverHorizontal() {
-        game = new TicTacToe("X")
+        game = new TicTacToe()
             .move(moves[0][0]).move(moves[1][0]).move(moves[0][2])
             .move(moves[1][1]).move(moves[0][1]);
         assertTrue(game.gameOver());
@@ -105,25 +65,25 @@ public class TicTacToeTest {
 
     @Test
     public void gameOverVertical() {
-        game = new TicTacToe("O")
+        game = new TicTacToe()
             .move(moves[1][2]).move(moves[1][1]).move(moves[2][2])
             .move(moves[2][0]).move(moves[0][2]);
-        assertTrue(game.gameOver());
-        assertEquals("O", game.winner());
-    }
-
-    @Test
-    public void gameOverDiagonal() {
-        game = new TicTacToe("O")
-            .move(moves[0][1]).move(moves[0][2]).move(moves[0][0])
-            .move(moves[2][0]).move(moves[2][2]).move(moves[1][1]);
         assertTrue(game.gameOver());
         assertEquals("X", game.winner());
     }
 
     @Test
+    public void gameOverDiagonal() {
+        game = new TicTacToe()
+            .move(moves[0][1]).move(moves[0][2]).move(moves[0][0])
+            .move(moves[2][0]).move(moves[2][2]).move(moves[1][1]);
+        assertTrue(game.gameOver());
+        assertEquals("O", game.winner());
+    }
+
+    @Test
     public void gameOverDraw() {
-        game = new TicTacToe("X")
+        game = new TicTacToe()
             .move(moves[1][1]).move(moves[1][0]).move(moves[0][0])
             .move(moves[2][2]).move(moves[2][1]).move(moves[0][1])
             .move(moves[0][2]).move(moves[2][0]).move(moves[1][2]);
@@ -133,7 +93,7 @@ public class TicTacToeTest {
 
     @Test
     public void gameActivePlayer() {
-        game = new TicTacToe("X");
+        game = new TicTacToe();
         assertEquals("X", game.activePlayer());
 
         game.move(moves[1][1]);
@@ -149,7 +109,7 @@ public class TicTacToeTest {
 
     @Test
     public void gameMove() {
-        game = new TicTacToe("X");
+        game = new TicTacToe();
         for (int r = 0; r < 3; r++)
             for (int c = 0; c < 3; c++)
                 assertEquals("", game.get(r, c));
@@ -164,7 +124,7 @@ public class TicTacToeTest {
 
     @Test
     public void gameMoveLegal() {
-        game = new TicTacToe("X");
+        game = new TicTacToe();
         for (TicTacToe.Move[] mvs : moves)
             for (TicTacToe.Move mv : mvs)
                 assertTrue(game.moveLegal(mv));
@@ -180,7 +140,7 @@ public class TicTacToeTest {
 
     @Test
     public void moveNotLegalBounds() {
-        game = new TicTacToe("X");
+        game = new TicTacToe();
         assertFalse(game.moveLegal(mv(0, 4)));
         assertFalse(game.moveLegal(mv(2, 3)));
         assertFalse(game.moveLegal(mv(0, -1)));
@@ -192,7 +152,7 @@ public class TicTacToeTest {
 
     @Test
     public void moveNotLegalOccupied() {
-        game = new TicTacToe("X");
+        game = new TicTacToe();
         game.move(moves[1][1]);
         assertFalse(game.moveLegal(moves[1][1]));
 
@@ -203,7 +163,7 @@ public class TicTacToeTest {
 
     @Test
     public void gameAllMoves() {
-        game = new TicTacToe("X");
+        game = new TicTacToe();
         List<TicTacToe.Move> allMoves = game.allMoves();
         assertEquals(9, allMoves.size());
         for (TicTacToe.Move[] mvs : moves)
@@ -213,7 +173,7 @@ public class TicTacToeTest {
 
     @Test
     public void allMovesSomeMoves() {
-        game = new TicTacToe("O");
+        game = new TicTacToe();
         game.move(moves[1][1]);
         game.move(moves[0][0]);
         game.move(moves[0][2]);
@@ -230,7 +190,7 @@ public class TicTacToeTest {
 
     @Test
     public void allMovesGameOver() {
-        game = new TicTacToe("X");
+        game = new TicTacToe();
         game.move(moves[0][0]);
         game.move(moves[0][1]);
         game.move(moves[0][2]);

@@ -7,8 +7,8 @@ import java.awt.*;
 
 @Getter
 public class ConnectFourSpace extends JButton {
-    private static final ImageIcon imageR = new ImageIcon("src/main/resources/icons/red_o.png");
-    private static final ImageIcon imageB = new ImageIcon("src/main/resources/icons/blue_o.png");
+    private static final ImageIcon imageR = new ImageIcon("src/main/resources/icons/red_chip.png");
+    private static final ImageIcon imageB = new ImageIcon("src/main/resources/icons/blue_chip.png");
 
     private final int column;
 

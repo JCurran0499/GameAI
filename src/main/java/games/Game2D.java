@@ -3,7 +3,7 @@ package games;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import resources.PlayerTypes;
+import resources.Players;
 
 import java.lang.reflect.Array;
 
@@ -15,19 +15,12 @@ public abstract class Game2D<S, M> implements Game<M> {
 
     protected S[][] board;
     protected String winner;
-    protected final PlayerTypes playerTypes;
-    @Getter protected final String player1;
-    @Getter protected final String player2;
+    @Getter protected final Players players;
 
     @SuppressWarnings("unchecked")
-    public Game2D(int rows, int cols, PlayerTypes playerTypes, String player1, NewSquare<S> f) {
-        if (!playerTypes.validType(player1))
-            throw new RuntimeException("invalid player configuration");
-
+    public Game2D(int rows, int cols, Players players, NewSquare<S> f) {
         this.winner = null;
-        this.playerTypes = playerTypes;
-        this.player1 = player1;
-        this.player2 = playerTypes.opposite(player1);
+        this.players = players;
 
         this.board = (S[][]) Array.newInstance(f.call(0, 0).getClass(), rows, cols);
         for (int r = 0; r < rows; r++) {

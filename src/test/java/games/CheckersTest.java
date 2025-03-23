@@ -10,9 +10,7 @@ public class CheckersTest {
 
     @Test
     public void gameInstantiation() {
-        game = new Checkers("R");
-        assertEquals("R", game.activePlayer());
-        assertEquals("R", game.player1);
-        assertEquals("B", game.player2);
+        game = new Checkers();
+        assertEquals("B", game.activePlayer());
     }
 }

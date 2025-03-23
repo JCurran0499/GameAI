@@ -5,7 +5,6 @@ import games.Game2D;
 import lombok.Getter;
 import lombok.Setter;
 import resources.MonteCarloTree;
-import resources.PlayerTypes;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
 
 public abstract class GamePanel<M> extends JPanel {
     private static final Random random = new Random();
@@ -24,26 +24,34 @@ public abstract class GamePanel<M> extends JPanel {
 
     protected final int rows;
     protected final int cols;
-    protected final PlayerTypes playerTypes;
     protected String player;
-    protected boolean playerGoesFirst;
     protected List<List<JButton>> spaces;
     protected Game2D<?, M> game;
     protected MonteCarloTree<M> monteCarloTree;
     protected Agent botAgent;
 
-    public GamePanel(String title, PlayerTypes playerTypes, int rows, int cols, int depth) {
+    public GamePanel(String title, int rows, int cols, int depth, Callable<Game2D<?, M>> f) {
         super();
+
+        try {
+            this.game = f.call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         this.title = title;
         this.rows = rows;
         this.cols = cols;
-        this.playerTypes = playerTypes;
-        this.player = playerChoice();
-        this.playerGoesFirst = random.nextBoolean();
         this.spaces = new ArrayList<>();
         this.botAgent = new Max();
-        this.game = newGame();
-        this.monteCarloTree = new MonteCarloTree<>(this.game, this.playerTypes.opposite(this.player), depth);
+
+        boolean playerGoesFirst = random.nextBoolean();
+        if (playerGoesFirst)
+            this.player = this.game.getPlayers().player1();
+        else
+            this.player = this.game.getPlayers().player2();
+
+        this.monteCarloTree = new MonteCarloTree<>(this.game, this.game.getPlayers().opposite(this.player), depth);
         setup();
     }
 
@@ -65,7 +73,5 @@ public abstract class GamePanel<M> extends JPanel {
 
     public abstract void actionListener(ActionEvent e);
     public abstract GamePanel<M> copy();
-    protected abstract String playerChoice();
-    protected abstract Game2D<?, M> newGame();
     protected abstract JButton newSpace(int r, int c);
 }

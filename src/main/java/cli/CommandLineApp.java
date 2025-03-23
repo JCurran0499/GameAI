@@ -3,44 +3,47 @@ package cli;
 import agents.Agent;
 import games.Game2D;
 import resources.MonteCarloTree;
-import resources.PlayerTypes;
 
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 
 public abstract class CommandLineApp<M> {
     private static final Random random = new Random();
     protected final Scanner scanner;
 
-    protected PlayerTypes playerTypes;
     protected String player;
-    protected boolean playerGoesFirst;
     protected Agent botAgent;
-
     protected Game2D<?, M> game;
     protected MonteCarloTree<M> monteCarloTree;
 
-    public CommandLineApp(Agent botAgent, PlayerTypes playerTypes, int depth, Scanner scanner) {
+    public CommandLineApp(Agent botAgent, int depth, Scanner scanner, Callable<Game2D<?, M>> f) {
+        this.botAgent = botAgent;
         this.scanner = scanner;
 
-        this.botAgent = botAgent;
-        this.playerTypes = playerTypes;
-        this.player = playerChoice();
-        System.out.println("You chose " + player + "!");
+        try {
+            this.game = f.call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
-        this.playerGoesFirst = random.nextBoolean();
-        if (playerGoesFirst)
-            System.out.println("Congratulations! You are going first.");
-        else
+        boolean playerGoesFirst = random.nextBoolean();
+        if (playerGoesFirst) {
+            this.player = this.game.getPlayers().player1();
+            System.out.println("Congratulations! You are going first");
+        }
+        else {
+            this.player = this.game.getPlayers().player2();
             System.out.println("Your opponent is going first");
+        }
+        System.out.println("You are player " + this.player);
 
-        this.game = newGame();
-        this.monteCarloTree = new MonteCarloTree<>(game, this.playerTypes.opposite(this.player), depth);
+        this.monteCarloTree = new MonteCarloTree<>(game, this.game.getPlayers().opposite(this.player), depth);
     }
 
     public void run() {
-        while (!game.gameOver()) {
-            if (game.activePlayer().equals(this.player)) {
+        while (!this.game.gameOver()) {
+            if (this.game.activePlayer().equals(this.player)) {
                 System.out.println("\r" + game.visualize());
                 M move = playerMoveChoice();
 
@@ -55,29 +58,13 @@ public abstract class CommandLineApp<M> {
         }
 
         System.out.println("\r" + game.visualize());
-        if (game.winner() == null)
+        if (this.game.winner() == null)
             System.out.println("The game was a draw!");
-        else if (game.winner().equals(this.player))
+        else if (this.game.winner().equals(this.player))
             System.out.println("Congratulations! You won!");
         else
             System.out.println("Sorry! You lost :(");
     }
 
-    private String playerChoice() {
-        String agent;
-        boolean choice;
-        String opt1 = this.playerTypes.type1();
-        String opt2 = this.playerTypes.type2();
-        System.out.println();
-        do {
-            System.out.printf("Choose a role (%s/%s): ", opt1, opt2);
-            agent = this.scanner.nextLine().strip().toUpperCase();
-            choice = (agent.equals(opt1) || agent.equals(opt2));
-        } while (!choice);
-
-        return agent;
-    }
-
-    protected abstract Game2D<?, M> newGame();
     protected abstract M playerMoveChoice();
 }

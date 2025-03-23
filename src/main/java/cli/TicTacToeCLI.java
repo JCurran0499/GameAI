@@ -2,20 +2,11 @@ package cli;
 
 import agents.Agent;
 import games.games2d.TicTacToe;
-import resources.PlayerTypes;
 import java.util.Scanner;
 
 public class TicTacToeCLI extends CommandLineApp<TicTacToe.Move> {
     public TicTacToeCLI(Agent botAgent, Scanner scanner) {
-        super(botAgent, PlayerTypes.TIC_TAC_TOE, 5, scanner);
-    }
-
-    @Override
-    protected TicTacToe newGame() {
-        if (this.playerGoesFirst)
-            return new TicTacToe(this.player);
-        else
-            return new TicTacToe(this.playerTypes.opposite(this.player));
+        super(botAgent, 5, scanner, TicTacToe::new);
     }
 
     @Override

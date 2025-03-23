@@ -7,7 +7,7 @@ import java.awt.*;
 @Getter
 public class TicTacToeSpace extends JButton {
     private static final ImageIcon imageX = new ImageIcon("src/main/resources/icons/x.png");
-    private static final ImageIcon imageO = new ImageIcon("src/main/resources/icons/blue_o.png");
+    private static final ImageIcon imageO = new ImageIcon("src/main/resources/icons/o.png");
 
     private final int row;
     private final int col;

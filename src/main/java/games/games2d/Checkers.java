@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import resources.ConsoleColors;
-import resources.PlayerTypes;
+import resources.Players;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +20,15 @@ public class Checkers extends Game2D<Checkers.Piece, Checkers.Move> {
     private String justSkipped;
 
     private Checkers(Checkers c) {
-        super(null, c.winner, c.playerTypes, c.player1, c.player2);
+        super(null, c.winner, c.players);
         this.redCount = c.redCount;
         this.blackCount = c.blackCount;
         this.lastMove = c.lastMove;
         this.justSkipped = c.justSkipped;
     }
 
-    public Checkers(String player1) {
-        super(ROWS, COLS, PlayerTypes.CHECKERS, player1, Checkers::newPiece);
+    public Checkers() {
+        super(ROWS, COLS, Players.CHECKERS, Checkers::newPiece);
         this.redCount = this.blackCount = 12;
         this.lastMove = null;
         this.justSkipped = "";
@@ -87,7 +87,7 @@ public class Checkers extends Game2D<Checkers.Piece, Checkers.Move> {
     @Override
     public String activePlayer() {
         if (this.lastMove == null)
-            return this.player1;
+            return this.players.player1();
 
         Piece piece = get(this.lastMove.dstRow(), this.lastMove.dstCol());
         if (this.justSkipped.equals(piece.getPlayer())) {
@@ -98,7 +98,7 @@ public class Checkers extends Game2D<Checkers.Piece, Checkers.Move> {
             }
         }
 
-        return this.playerTypes.opposite(piece.getPlayer());
+        return this.players.opposite(piece.getPlayer());
     }
 
     @Override

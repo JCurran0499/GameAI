@@ -2,7 +2,6 @@ package gui.tictactoe;
 
 import games.games2d.TicTacToe;
 import gui.GamePanel;
-import resources.PlayerTypes;
 
 import java.util.List;
 import javax.swing.*;
@@ -10,7 +9,7 @@ import java.awt.event.ActionEvent;
 
 public class TicTacToePanel extends GamePanel<TicTacToe.Move> {
     public TicTacToePanel() {
-        super("Tic Tac Toe", PlayerTypes.TIC_TAC_TOE, 3, 3, 5);
+        super("Tic Tac Toe", 3, 3, 5, TicTacToe::new);
         if (!game.activePlayer().equals(player))
             botMove();
     }
@@ -46,19 +45,6 @@ public class TicTacToePanel extends GamePanel<TicTacToe.Move> {
     @Override
     public TicTacToePanel copy() {
         return new TicTacToePanel();
-    }
-
-    @Override
-    protected String playerChoice() {
-        return "O";
-    }
-
-    @Override
-    protected TicTacToe newGame() {
-        if (this.playerGoesFirst)
-            return new TicTacToe(this.player);
-        else
-            return new TicTacToe(this.playerTypes.opposite(this.player));
     }
 
     @Override
